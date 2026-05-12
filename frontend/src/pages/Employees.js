@@ -5,7 +5,7 @@ import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import '../PremiumTheme.css';
-
+// this is update
 const ALL_COLUMNS = [
   { key: 'EMP_Slno', label: 'SL NO' },
   { key: 'EMP_IMAGE', label: 'PHOTO' },
