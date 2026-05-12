@@ -488,8 +488,29 @@ function Employees() {
 
             {employees.length > 0 && (
               <div className="pagination-container-premium">
-                <div className="pagination-info">
-                  Showing <span className="fw-bold">{(currentPage - 1) * pageSize + 1}</span> to <span className="fw-bold">{Math.min(currentPage * pageSize, totalRecords)}</span> of <span className="fw-bold">{totalRecords}</span> personnel
+                <div className="d-flex align-items-center gap-4">
+                  <div className="pagination-info">
+                    Showing <span className="fw-bold">{(currentPage - 1) * pageSize + 1}</span> to <span className="fw-bold">{Math.min(currentPage * pageSize, totalRecords)}</span> of <span className="fw-bold">{totalRecords}</span> personnel
+                  </div>
+                  <div className="d-flex align-items-center gap-2">
+                    <span className="small text-muted text-uppercase fw-bold" style={{ fontSize: '0.7rem' }}>Rows per page:</span>
+                    <Form.Select 
+                      size="sm" 
+                      className="form-select-sm border-0 bg-light shadow-sm"
+                      style={{ width: 'auto', fontSize: '0.8rem', cursor: 'pointer' }}
+                      value={pageSize}
+                      onChange={(e) => {
+                        setPageSize(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                    >
+                      <option value={10}>10</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value={totalRecords > 0 ? totalRecords : 1000000}>All</option>
+                    </Form.Select>
+                  </div>
                 </div>
                 <div className="pagination-controls">
                   <button
