@@ -3,7 +3,7 @@ import { Navbar, Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import socketService from '../services/socket';
 import './Navigation.css';
-
+// this
 function Navigation({ onToggleSidebar, user }) {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
@@ -13,15 +13,15 @@ function Navigation({ onToggleSidebar, user }) {
   const [showSearchResults, setShowSearchResults] = useState(false);
 
   const SEARCHABLE_PAGES = [
-    { title: 'Dashboard', path: '/', category: 'Page', icon: 'fa-th-large' },
-    { title: 'Employees', path: '/employees', category: 'Management', icon: 'fa-users' },
+    { title: 'Dashboard', path: '/', category: 'Dashboard', icon: 'fa-th-large' },
+    { title: 'Cost Allocation', path: '/reports/cost-allocation', category: 'Reports', icon: 'fa-bar-chart' },
+    { title: 'Cost Allocation Filter', path: '/reports/cost-allocation-month-with-filter', category: 'Reports', icon: 'fa-filter' },
+    { title: 'Annual Leave Exit Permit', path: '/reports/annual-leave-exit-permit', category: 'Reports', icon: 'fa-plane' },
+    { title: 'Attendance Register', path: '/reports/attendance-register', category: 'Reports', icon: 'fa-clock-o' },
+    { title: 'Attendance Register All', path: '/reports/attendance-register-all', category: 'Reports', icon: 'fa-clock-o' },
+    { title: 'Employee Site Location', path: '/reports/employee-site-location', category: 'Reports', icon: 'fa-map-marker' },
     { title: 'User Roles', path: '/user-roles', category: 'Management', icon: 'fa-shield' },
-    { title: 'Cost Allocation', path: '/reports/cost-allocation', category: 'Report', icon: 'fa-bar-chart' },
-    { title: 'Cost Allocation Month', path: '/reports/cost-allocation-month', category: 'Report', icon: 'fa-calendar' },
-    { title: 'Cost Allocation Filter', path: '/reports/cost-allocation-month-with-filter', category: 'Report', icon: 'fa-filter' },
-    { title: 'Annual Leave Exit Permit', path: '/reports/annual-leave-exit-permit', category: 'Report', icon: 'fa-plane' },
-    { title: 'Attendance Register', path: '/reports/attendance-register', category: 'Report', icon: 'fa-clock-o' },
-    { title: 'Employee Site Location', path: '/reports/employee-site-location', category: 'Report', icon: 'fa-map-marker' },
+    { title: 'Employees', path: '/employees', category: 'Management', icon: 'fa-users' },
     { title: 'My Profile', path: '/profile', category: 'User', icon: 'fa-user-o' },
     { title: 'Settings', path: '/settings', category: 'User', icon: 'fa-cog' }
   ];

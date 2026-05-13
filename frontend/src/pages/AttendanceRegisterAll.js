@@ -506,7 +506,7 @@ function AttendanceRegisterAll() {
             <table className="table-premium">
               <thead>
                 <tr>
-                  <th>FINGER ID</th>
+                  <th>S/N</th>
                   <th>EMP CODE</th>
                   <th>EMPLOYEE NAME</th>
                   <th>LOCATION</th>
@@ -519,7 +519,7 @@ function AttendanceRegisterAll() {
               <tbody>
                 {getCurrentPageData().map((row, index) => (
                   <tr key={index}>
-                    <td>{row.RAW_FINGERID}</td>
+                    <td>{index + 1}</td>
                     <td>{row.RAW_EMPCODE}</td>
                     <td className="fw-bold">{row.EMP_NAME}</td>
                     <td>{row.LOCATION || '-'}</td>
@@ -606,7 +606,7 @@ function AttendanceRegisterAll() {
              <table className="table-premium mb-0">
                <thead>
                  <tr>
-                   <th>FINGER ID</th>
+                   <th>S/N</th>
                    <th>EMP CODE</th>
                    <th>EMPLOYEE NAME</th>
                    <th>LOCATION</th>
@@ -620,7 +620,7 @@ function AttendanceRegisterAll() {
                  {getFilteredSummaryData().length > 0 ? (
                    getFilteredSummaryData().map((row, idx) => (
                      <tr key={idx}>
-                       <td>{row.RAW_FINGERID}</td>
+                       <td>{idx + 1}</td>
                        <td>{row.RAW_EMPCODE}</td>
                        <td className="fw-bold">{row.EMP_NAME}</td>
                        <td>{row.LOCATION || '-'}</td>

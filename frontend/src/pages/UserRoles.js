@@ -2,22 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Modal, Button, Badge, Table } from 'react-bootstrap';
 import { authAPI } from '../services/api';
 import '../PremiumTheme.css';
-
+// this
 const ROLES = [
   { id: 'admin', label: 'Administrator', color: 'danger', permissions: ['all'] },
-  { id: 'manager', label: 'Manager', color: 'primary', permissions: ['reports', 'employees', 'payroll'] },
-  { id: 'user', label: 'Standard User', color: 'info', permissions: ['reports', 'view_only'] }
+  { id: 'manager', label: 'Manager', color: 'primary', permissions: ['dashboard', 'employees', 'report-cost-allocation', 'report-attendance-register'] },
+  { id: 'user', label: 'Standard User', color: 'info', permissions: ['dashboard'] }
 ];
 
 const PAGES = [
   { id: 'dashboard', label: 'Dashboard', icon: 'fa-th-large' },
   { id: 'employees', label: 'Employees', icon: 'fa-users' },
-  { id: 'payroll', label: 'Payroll', icon: 'fa-money' },
   { id: 'report-cost-allocation', label: 'Report: Cost Allocation', icon: 'fa-bar-chart' },
-  { id: 'report-cost-allocation-month', label: 'Report: Cost Allocation Month', icon: 'fa-calendar' },
   { id: 'report-cost-allocation-filter', label: 'Report: Cost Allocation Filter', icon: 'fa-filter' },
   { id: 'report-annual-leave-exit-permit', label: 'Report: Annual Leave Exit Permit', icon: 'fa-plane' },
   { id: 'report-attendance-register', label: 'Report: Attendance Register', icon: 'fa-clock-o' },
+  { id: 'report-attendance-register-all', label: 'Report: Attendance Register All', icon: 'fa-clock-o' },
   { id: 'report-employee-site-location', label: 'Report: Employee Site Location', icon: 'fa-map-marker' },
   { id: 'user-roles', label: 'User Roles', icon: 'fa-shield' },
   { id: 'settings', label: 'Settings', icon: 'fa-cog' }
@@ -36,6 +35,7 @@ function UserRoles() {
     name: '',
     role: 'user',
     email: '',
+    phone: '',
     department: '',
     designation: '',
     permissions: []
@@ -79,6 +79,7 @@ function UserRoles() {
       name: '',
       role: 'user',
       email: '',
+      phone: '',
       department: '',
       designation: '',
       permissions: []
@@ -95,6 +96,7 @@ function UserRoles() {
       name: user.USR_Name,
       role: user.role || 'user',
       email: user.email || '',
+      phone: user.phone || '',
       department: user.department || '',
       designation: user.designation || '',
       permissions: user.permissions ? (typeof user.permissions === 'string' ? JSON.parse(user.permissions) : user.permissions) : []
@@ -111,6 +113,7 @@ function UserRoles() {
       name: user.USR_Name,
       role: user.role || 'user',
       email: user.email || '',
+      phone: user.phone || '',
       department: user.department || '',
       designation: user.designation || '',
       permissions: user.permissions ? (typeof user.permissions === 'string' ? JSON.parse(user.permissions) : user.permissions) : []
@@ -315,6 +318,28 @@ function UserRoles() {
               )}
               <Col md={6}>
                 <Form.Group>
+                  <Form.Label className="form-label fw-bold small text-muted text-uppercase">Email Address</Form.Label>
+                  <Form.Control 
+                    type="email" name="email" className="form-control" 
+                    value={formData.email} onChange={handleInputChange} 
+                    placeholder="e.g. john@example.com"
+                    disabled={viewOnly}
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label className="form-label fw-bold small text-muted text-uppercase">Phone Number</Form.Label>
+                  <Form.Control 
+                    type="text" name="phone" className="form-control" 
+                    value={formData.phone} onChange={handleInputChange} 
+                    placeholder="e.g. +1234567890"
+                    disabled={viewOnly}
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
                   <Form.Label className="form-label fw-bold small text-muted text-uppercase">System Role</Form.Label>
                   <Form.Select 
                     name="role" className="form-select" 
@@ -353,9 +378,28 @@ function UserRoles() {
               </Col>
               
               <Col md={12}>
-                <h6 className="fw-bold mb-3 d-flex align-items-center text-uppercase small text-primary">
-                  <i className="fa fa-shield me-2"></i> Page Access Permissions
-                </h6>
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <h6 className="fw-bold m-0 d-flex align-items-center text-uppercase small text-primary">
+                    <i className="fa fa-shield me-2"></i> Page Access Permissions
+                  </h6>
+                  {!viewOnly && (
+                    <div className="d-flex gap-2">
+                      <button 
+                        type="button" className="btn btn-link btn-sm p-0 text-decoration-none small"
+                        onClick={() => setFormData(prev => ({ ...prev, permissions: PAGES.map(p => p.id) }))}
+                      >
+                        Select All
+                      </button>
+                      <span className="text-muted small">|</span>
+                      <button 
+                        type="button" className="btn btn-link btn-sm p-0 text-decoration-none small"
+                        onClick={() => setFormData(prev => ({ ...prev, permissions: [] }))}
+                      >
+                        Clear All
+                      </button>
+                    </div>
+                  )}
+                </div>
                 <div className="premium-card bg-light p-3 border-0">
                   <div className="row g-3">
                     {PAGES.map(page => (

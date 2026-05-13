@@ -387,8 +387,9 @@
 }
 
 .quick-link-item:hover {
-  background-color: #f8fafc;
+  background-color: white;
   border-color: var(--border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transform: translateX(4px);
   color: var(--primary-color);
 }

@@ -45,7 +45,8 @@ const getAnnualLeaveExitPermit = async (req, res) => {
           let match = true;
 
           if ((fromDate && fromDate !== '') || (toDate && toDate !== '')) {
-            const rawDate = record.PFT_DATE || record.PFT_FROM_DT;
+            // Use START DATE (PFT_FROM_DT) for filtering instead of Request Date (PFT_DATE)
+            const rawDate = record.PFT_FROM_DT || record.PFT_DATE;
             if (!rawDate) return false;
 
             const recordDate = new Date(rawDate);
