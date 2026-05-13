@@ -21,10 +21,13 @@
 
 .sidebar.closed {
   transform: translateX(-100%);
+  opacity: 0;
+  visibility: hidden;
 }
 
 .sidebar.open {
   transform: translateX(0) !important;
+  opacity: 1;
   visibility: visible !important;
   display: flex !important;
 }
@@ -244,8 +247,48 @@
   margin-bottom: 0;
 }
 
+.sidebar.collapsed .nav-text,
+.sidebar.collapsed .brand-name,
+.sidebar.collapsed .user-details,
+.sidebar.collapsed .nav-section-label,
+.sidebar.collapsed .sidebar-powered-by,
+.sidebar.collapsed .logout-mini-btn {
+  display: none !important;
+}
+
+.sidebar.collapsed .sidebar-header {
+  padding: 0;
+  justify-content: center;
+}
+
+.sidebar.collapsed .brand-icon {
+  margin: 0;
+}
+
+.sidebar.collapsed .sidebar-footer {
+  padding: 0.75rem 0;
+}
+
+.sidebar.collapsed .user-info {
+  background: none;
+  padding: 0;
+  justify-content: center;
+}
+
 @media (max-width: 768px) {
   .sidebar {
-    width: 260px;
+    width: 280px;
+    box-shadow: 20px 0 25px -5px rgba(0, 0, 0, 0.4);
+  }
+  
+  .sidebar.collapsed {
+    width: 280px; /* On mobile, we don't really want 'collapsed', just 'open' or 'closed' */
+  }
+  
+  .sidebar.collapsed .nav-text,
+  .sidebar.collapsed .brand-name,
+  .sidebar.collapsed .user-details,
+  .sidebar.collapsed .nav-section-label {
+    display: flex !important;
   }
 }

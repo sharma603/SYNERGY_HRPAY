@@ -177,7 +177,7 @@ router.get('/users', auth, admin, async (req, res) => {
     
     // Only get users from new Users table
     const usersNewResult = await pool.request().query(`
-      SELECT id, username as USR_UserID, name as USR_Name, password as PASSWORD, role, permissions, 'new' as source
+      SELECT username as USR_UserID, name as USR_Name, password as PASSWORD, role, permissions, 'new' as source
       FROM Users
       ORDER BY name
     `);
@@ -385,6 +385,23 @@ router.get('/master-data', auth, async (req, res) => {
       ORDER BY c.COM_DESC
     `);
 
+    const attendanceStatuses = await safeQuery(`
+      SELECT DISTINCT name FROM (
+        SELECT COM_DESC as name 
+        FROM COMMONCODES 
+        WHERE COM_TYPE = 44 
+        UNION
+        SELECT 'Present' as name
+        UNION
+        SELECT 'Absent' as name
+        UNION
+        SELECT 'Vacation' as name
+        UNION
+        SELECT 'Holiday' as name
+      ) AS Statuses
+      ORDER BY name
+    `);
+
     res.json({
       departments,
       designations,
@@ -392,7 +409,8 @@ router.get('/master-data', auth, async (req, res) => {
       locations,
       sections,
       companies,
-      projects
+      projects,
+      attendanceStatuses
     });
   } catch (error) {
     console.error('Error fetching master data:', error);

@@ -3,10 +3,10 @@ import Select, { components } from 'react-select';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { costAllocationAPI } from '../services/api'; 
+import { costAllocationAPI } from '../services/api';
 import '../PremiumTheme.css';
 import './CostAllocationMonth.css';
-
+// this
 function CostAllocationMonthWithFilter() {
   const [reportData, setReportData] = useState([]);
   const [columns, setColumns] = useState([]);
@@ -15,10 +15,10 @@ function CostAllocationMonthWithFilter() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showExportOptions, setShowExportOptions] = useState(false);
-  const [activeMenu, setActiveMenu] = useState(null); 
-  
+  const [activeMenu, setActiveMenu] = useState(null);
+
   const [filters, setFilters] = useState({
-    payGroups: [],
+    payGroup: '',
     payPeriods: [],
     designations: [],
     employees: [],
@@ -30,6 +30,7 @@ function CostAllocationMonthWithFilter() {
   });
 
   const [filterOptions, setFilterOptions] = useState({
+    payGroups: [],
     payPeriods: [],
     designations: [],
     employees: [],
@@ -40,35 +41,106 @@ function CostAllocationMonthWithFilter() {
     employers: []
   });
 
-  const fetchFilterOptions = useCallback(async () => {
+  const fetchFilterOptions = useCallback(async (currentFilters = filters) => {
     try {
-      // Use mode 1 and 2 to get initial options from existing API
-      const pgResponse = await costAllocationAPI.getReport({ mode: 1 });
-      const payGroups = pgResponse.data.filters.payGroups;
-      
-      if (payGroups && payGroups.length > 0) {
-        // Get all filters for the first group to populate options
-        const response = await costAllocationAPI.getReport({ mode: 2, payGroup: payGroups[0].id });
-        const f = response.data.filters;
-        setFilterOptions({
-          payPeriods: f.payPeriods || [],
-          designations: f.designations || [],
-          employees: f.employees || [],
-          projects: f.projects || [],
-          sections: f.sections || [],
-          companies: f.companies || [],
-          departments: f.departments || [],
-          employers: f.employers || []
+      // Helper to normalize filter options - try common column names
+      const normalize = (arr) => {
+        if (!arr || !Array.isArray(arr)) return [];
+        return arr.map(item => {
+          // Find the best candidate for "name"
+          let name = item.name || 
+                       item.EMP_Name || 
+                       item.EMP_NAME ||
+                       item.COM_DESC || 
+                       item.COM_Desc ||
+                       item.COM_Name || 
+                       item.COM_NAME ||
+                       item.HRM_PAY_PERIOD_DESC || 
+                       item.HRM_PAY_GROUP_DESC ||
+                       (typeof item === 'string' ? item : Object.values(item).find(v => typeof v === 'string') || 'Unknown');
+          
+          // Special handling for employees: Include both Code and Name for better filtering
+          if (item.EMP_Code && item.EMP_Name) {
+            name = `${item.EMP_Code} - ${item.EMP_Name.trim()}`;
+          } else if (typeof name === 'string') {
+            name = name.trim();
+          }
+
+          const id = item.id || 
+                     item.COM_SLNO || 
+                     item.COM_Slno ||
+                     item.EMP_Slno || 
+                     item.EMP_SLNO ||
+                     item.HRM_PAY_PERIOD_SLNO || 
+                     item.HRM_PAY_GROUP_SLNO ||
+                     item.ID || item.Id ||
+                     (typeof Object.values(item).find(v => typeof v === 'number') !== 'undefined' ? Object.values(item).find(v => typeof v === 'number') : Object.values(item)[0]);
+          
+          return { ...item, name, id };
         });
+      };
+
+      // 1. Fetch Pay Groups if not already fetched
+      let payGroups = filterOptions.payGroups;
+      if (payGroups.length === 0) {
+        const pgResponse = await costAllocationAPI.getReport({ mode: 1 });
+        payGroups = normalize(pgResponse.data.filters.payGroups || []);
+      }
+      
+      const activePayGroup = currentFilters.payGroup || (payGroups.length > 0 ? payGroups[0].id : null);
+      
+      if (activePayGroup) {
+        // 2. Fetch all cascading filters based on selected Pay Group
+        const response = await costAllocationAPI.getReport({ 
+          mode: 2, 
+          payGroup: activePayGroup 
+        });
+        
+        const f = response.data.filters;
+
+        setFilterOptions({
+          payGroups: payGroups,
+          payPeriods: normalize(f.payPeriods),
+          designations: normalize(f.designations),
+          employees: normalize(f.employees),
+          projects: normalize(f.projects),
+          sections: normalize(f.sections),
+          companies: normalize(f.companies),
+          departments: normalize(f.departments),
+          employers: normalize(f.employers)
+        });
+
+        // Set initial pay group if none selected
+        if (!currentFilters.payGroup && activePayGroup) {
+          setFilters(prev => ({ ...prev, payGroup: activePayGroup }));
+        }
       }
     } catch (err) {
       console.error('Failed to fetch filter options:', err);
     }
-  }, []);
+  }, [filterOptions.payGroups, filters])
 
   useEffect(() => {
     fetchFilterOptions();
-  }, [fetchFilterOptions]);
+  }, []);
+
+  const handlePayGroupChange = (selectedOption) => {
+    const newPayGroup = selectedOption ? selectedOption.value : '';
+    const updatedFilters = {
+      ...filters,
+      payGroup: newPayGroup,
+      payPeriods: [],
+      designations: [],
+      employees: [],
+      projects: [],
+      sections: [],
+      companies: [],
+      departments: [],
+      employers: []
+    };
+    setFilters(updatedFilters);
+    fetchFilterOptions(updatedFilters);
+  };
 
   const fetchReportData = async () => {
     if (filters.payPeriods.length === 0) {
@@ -79,7 +151,7 @@ function CostAllocationMonthWithFilter() {
     try {
       setLoading(true);
       setError('');
-      
+
       // Sending all filters to the API
       const response = await costAllocationAPI.getDesignationSummaryWithFilters({
         payPeriods: filters.payPeriods.join(','),
@@ -107,7 +179,7 @@ function CostAllocationMonthWithFilter() {
           } else if (col.includes('Amount')) {
             totals[col] = data.reduce((sum, row) => sum + (Number(row[col]) || 0), 0);
           } else {
-            totals[col] = ''; 
+            totals[col] = '';
           }
         });
         setTotalRow(totals);
@@ -141,11 +213,11 @@ function CostAllocationMonthWithFilter() {
             className="form-check-input me-2"
             style={{ cursor: 'pointer', flexShrink: 0, width: '14px', height: '14px' }}
           />
-          <span style={{ 
-            fontSize: '0.75rem', 
-            whiteSpace: 'nowrap', 
-            overflow: 'hidden', 
-            textOverflow: 'ellipsis' 
+          <span style={{
+            fontSize: '0.75rem',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
           }}>
             {props.label}
           </span>
@@ -164,7 +236,7 @@ function CostAllocationMonthWithFilter() {
     const { getValue, hasValue } = props;
     const selected = getValue();
     const allOptions = props.options.filter(opt => opt.value !== '*');
-    
+
     if (!hasValue) {
       return (
         <components.ValueContainer {...props}>
@@ -211,7 +283,9 @@ function CostAllocationMonthWithFilter() {
   };
 
   const clearFilters = () => {
+    const defaultPayGroup = filterOptions.payGroups.length > 0 ? filterOptions.payGroups[0].id : '';
     setFilters({
+      payGroup: defaultPayGroup,
       payPeriods: [],
       designations: [],
       employees: [],
@@ -224,6 +298,11 @@ function CostAllocationMonthWithFilter() {
     setReportData([]);
     setColumns([]);
     setError('');
+
+    // Refresh options based on default pay group
+    if (defaultPayGroup) {
+      fetchFilterOptions({ payGroup: defaultPayGroup });
+    }
   };
 
   const exportToExcel = () => {
@@ -244,26 +323,26 @@ function CostAllocationMonthWithFilter() {
     try {
       const doc = new jsPDF('l', 'pt', 'a4');
       const pageWidth = doc.internal.pageSize.getWidth();
-      
+
       if (companyName) {
         doc.setFontSize(16);
         doc.setTextColor(79, 70, 229);
         doc.setFont('helvetica', 'bold');
         doc.text(companyName.toUpperCase(), pageWidth / 2, 40, { align: 'center' });
       }
-      
+
       doc.setFontSize(12);
       doc.setTextColor(51, 65, 85);
       doc.text('Advanced Multi-Period Comparison Report', pageWidth / 2, 60, { align: 'center' });
-      
-      const tableData = reportData.map(item => 
-        columns.map(col => typeof item[col] === 'number' 
+
+      const tableData = reportData.map(item =>
+        columns.map(col => typeof item[col] === 'number'
           ? item[col].toLocaleString(undefined, { minimumFractionDigits: col.includes('Amount') ? 2 : 0 })
           : item[col] || '')
       );
 
       if (totalRow) {
-        tableData.push(columns.map(col => typeof totalRow[col] === 'number' 
+        tableData.push(columns.map(col => typeof totalRow[col] === 'number'
           ? totalRow[col].toLocaleString(undefined, { minimumFractionDigits: 2 })
           : totalRow[col] || ''));
       }
@@ -274,7 +353,7 @@ function CostAllocationMonthWithFilter() {
         startY: 90,
         styles: { fontSize: 7, cellPadding: 3 },
         headStyles: { fillColor: [44, 62, 80], textColor: [255, 255, 255] },
-        didParseCell: function(data) {
+        didParseCell: function (data) {
           if (data.section === 'body' && data.column.index > 0) {
             data.cell.styles.halign = 'right';
           }
@@ -405,18 +484,18 @@ function CostAllocationMonthWithFilter() {
           {renderDropdown('employers', 'EMPLOYERS', filterOptions.employers)}
         </div>
         <div className="mt-3 d-flex justify-content-end gap-2">
-          <button 
+          <button
             type="button"
-            className="btn-premium btn-premium-primary px-4 py-2" 
-            onClick={fetchReportData} 
+            className="btn-premium btn-premium-primary px-4 py-2"
+            onClick={fetchReportData}
             disabled={loading || filters.payPeriods.length === 0}
             style={{ fontSize: '0.85rem' }}
           >
             {loading ? <><span className="spinner-border spinner-border-sm me-2"></span> Generating...</> : <><i className="fa fa-search"></i> <span>Generate Comparison</span></>}
           </button>
-          <button 
+          <button
             type="button"
-            className="btn-premium btn-premium-secondary px-4 py-2" 
+            className="btn-premium btn-premium-secondary px-4 py-2"
             onClick={clearFilters}
             disabled={loading}
             style={{ fontSize: '0.85rem' }}
@@ -444,42 +523,42 @@ function CostAllocationMonthWithFilter() {
                   </tr>
                 </thead>
                 <tbody>
-                    {reportData.length === 0 ? (
-                      <tr>
-                        <td colSpan={columns.length || 1} className="text-center p-5 text-muted small">
-                          Select periods and filters to begin analysis.
-                        </td>
-                      </tr>
-                    ) : (
-                      <>
-                        {reportData.map((row, idx) => (
-                          <tr key={idx}>
-                            {columns.map((col, colIdx) => (
-                              <td key={colIdx} style={{ textAlign: colIdx === 0 ? 'left' : 'right' }}
-                                  className={colIdx === 0 ? 'designation-column' : col.includes('Amount') ? 'amount-column' : 'count-column'}>
-                                {typeof row[col] === 'number' 
-                                  ? row[col].toLocaleString(undefined, { 
-                                      minimumFractionDigits: col.includes('Amount') ? 2 : 0,
-                                      maximumFractionDigits: col.includes('Amount') ? 2 : 0
-                                    })
-                                  : row[col]}
-                              </td>
-                            ))}
-                          </tr>
-                        ))}
-                        {totalRow && (
-                          <tr className="total-row-premium">
-                            {columns.map((col, idx) => (
-                              <td key={idx} style={{ textAlign: idx === 0 ? 'left' : 'right' }} className={idx === 0 ? 'designation-column' : ''}>
-                                {typeof totalRow[col] === 'number' 
-                                  ? totalRow[col].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                                  : totalRow[col]}
-                              </td>
-                            ))}
-                          </tr>
-                        )}
-                      </>
-                    )}
+                  {reportData.length === 0 ? (
+                    <tr>
+                      <td colSpan={columns.length || 1} className="text-center p-5 text-muted small">
+                        Select periods and filters to begin analysis.
+                      </td>
+                    </tr>
+                  ) : (
+                    <>
+                      {reportData.map((row, idx) => (
+                        <tr key={idx}>
+                          {columns.map((col, colIdx) => (
+                            <td key={colIdx} style={{ textAlign: colIdx === 0 ? 'left' : 'right' }}
+                              className={colIdx === 0 ? 'designation-column' : col.includes('Amount') ? 'amount-column' : 'count-column'}>
+                              {typeof row[col] === 'number'
+                                ? row[col].toLocaleString(undefined, {
+                                  minimumFractionDigits: col.includes('Amount') ? 2 : 0,
+                                  maximumFractionDigits: col.includes('Amount') ? 2 : 0
+                                })
+                                : row[col]}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                      {totalRow && (
+                        <tr className="total-row-premium">
+                          {columns.map((col, idx) => (
+                            <td key={idx} style={{ textAlign: idx === 0 ? 'left' : 'right' }} className={idx === 0 ? 'designation-column' : ''}>
+                              {typeof totalRow[col] === 'number'
+                                ? totalRow[col].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                : totalRow[col]}
+                            </td>
+                          ))}
+                        </tr>
+                      )}
+                    </>
+                  )}
                 </tbody>
               </table>
             </div>

@@ -1,3 +1,4 @@
+/* this */
 /* Avatar Upload Styles */
 .upload-avatar-container {
   position: relative;
@@ -196,6 +197,21 @@
 .loading-overlay {
   padding: 4rem 2rem;
   text-align: center;
+}
+
+/* Status Breakdown Clickable Styles */
+.status-row-clickable:hover {
+  background-color: #f8fafc !important;
+  transform: translateX(4px);
+}
+
+.status-row-clickable:hover .badge {
+  background-color: #e2e8f0 !important;
+  transform: scale(1.05);
+}
+
+.status-row-clickable {
+  transition: all 0.2s ease;
 }
 
 .spinner-premium {

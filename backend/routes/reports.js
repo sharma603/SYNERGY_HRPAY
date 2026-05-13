@@ -1,21 +1,39 @@
 const express = require('express');
 const router = express.Router();
-const reportController = require('../controllers/reportController');
-const { auth, admin } = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
+
+// Import individual report controllers
+const costAllocationController = require('../controllers/reports/costAllocationController');
+const designationSummaryController = require('../controllers/reports/designationSummaryController');
+const annualLeaveController = require('../controllers/reports/annualLeaveController');
+const attendanceRegisterController = require('../controllers/reports/attendanceRegisterController');
+const attendanceRegisterAllController = require('../controllers/reports/attendanceRegisterAllController');
+const employeeProjectController = require('../controllers/reports/employeeProjectController');
 
 // Cost Allocation Report routes - Restricted to Admin/HR
-router.get('/cost-allocation', auth, reportController.getCostAllocationReport);
-router.post('/cost-allocation', auth, reportController.getCostAllocationReport);
-router.get('/cost-allocation/export', auth, reportController.exportCostAllocationReport);
-router.get('/designation-summary', auth, reportController.getDesignationMultiPeriodSummary);
-router.post('/designation-summary', auth, reportController.getDesignationMultiPeriodSummary);
-router.get('/designation-summary-filters', auth, reportController.getDesignationMultiPeriodSummarywithfilters);
-router.post('/designation-summary-filters', auth, reportController.getDesignationMultiPeriodSummarywithfilters);
-router.get('/annual-leave-exit-permit', auth, reportController.getAnnualLeaveExitPermit);
-router.post('/annual-leave-exit-permit', auth, reportController.getAnnualLeaveExitPermit);
-router.get('/attendance-register', auth, reportController.getAttendanceRegister);
-router.post('/attendance-register', auth, reportController.getAttendanceRegister);
-router.get('/employee-site-location', auth, reportController.getEmployeeProjectReport);
-router.post('/employee-site-location', auth, reportController.getEmployeeProjectReport);
+router.get('/cost-allocation', auth, costAllocationController.getCostAllocationReport);
+router.post('/cost-allocation', auth, costAllocationController.getCostAllocationReport);
+router.get('/cost-allocation/export', auth, costAllocationController.exportCostAllocationReport);
+
+// Designation Summary routes
+router.get('/designation-summary', auth, designationSummaryController.getDesignationMultiPeriodSummary);
+router.post('/designation-summary', auth, designationSummaryController.getDesignationMultiPeriodSummary);
+router.get('/designation-summary-filters', auth, designationSummaryController.getDesignationMultiPeriodSummarywithfilters);
+router.post('/designation-summary-filters', auth, designationSummaryController.getDesignationMultiPeriodSummarywithfilters);
+
+// Annual Leave Exit Permit routes
+router.get('/annual-leave-exit-permit', auth, annualLeaveController.getAnnualLeaveExitPermit);
+router.post('/annual-leave-exit-permit', auth, annualLeaveController.getAnnualLeaveExitPermit);
+
+// Attendance Register routes
+router.get('/attendance-register', auth, attendanceRegisterController.getAttendanceRegister);
+router.post('/attendance-register', auth, attendanceRegisterController.getAttendanceRegister);
+router.get('/attendance-register-all', auth, attendanceRegisterAllController.getAttendanceRegisterAll);
+router.post('/attendance-register-all', auth, attendanceRegisterAllController.getAttendanceRegisterAll);
+router.post('/attendance-register-all/update-status', auth, attendanceRegisterAllController.updateAttendanceStatus);
+
+// Employee Site Location routes
+router.get('/employee-site-location', auth, employeeProjectController.getEmployeeProjectReport);
+router.post('/employee-site-location', auth, employeeProjectController.getEmployeeProjectReport);
 
 module.exports = router;

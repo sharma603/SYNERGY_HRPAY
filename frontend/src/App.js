@@ -1,3 +1,4 @@
+// this
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
@@ -10,6 +11,7 @@ import CostAllocationMonth from './pages/CostAllocationMonth';
 import CostAllocationMonth_with_filter from './pages/CostAllocationMonth_with_filter';
 import AnnualLeaveExitPermit from './pages/AnnualLeaveExitPermit';
 import AttendanceRegister from './pages/AttendanceRegister';
+import AttendanceRegisterAll from './pages/AttendanceRegisterAll';
 import EmployeeSiteLocation from './pages/EmployeeSiteLocation';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
@@ -118,6 +120,7 @@ function App() {
               <Route path="/reports/cost-allocation-month-with-filter" element={<ProtectedRoute pageId="report-cost-allocation-filter" allowedRoles={['admin']}><CostAllocationMonth_with_filter /></ProtectedRoute>} />
               <Route path="/reports/annual-leave-exit-permit" element={<ProtectedRoute pageId="report-annual-leave-exit-permit" allowedRoles={['admin']}><AnnualLeaveExitPermit /></ProtectedRoute>} />
               <Route path="/reports/attendance-register" element={<ProtectedRoute pageId="report-attendance-register" allowedRoles={['admin']}><AttendanceRegister /></ProtectedRoute>} />
+              <Route path="/reports/attendance-register-all" element={<ProtectedRoute pageId="report-attendance-register-all" allowedRoles={['admin']}><AttendanceRegisterAll /></ProtectedRoute>} />
               <Route path="/reports/employee-site-location" element={<ProtectedRoute pageId="report-employee-site-location" allowedRoles={['admin']}><EmployeeSiteLocation /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute pageId="settings"><Settings /></ProtectedRoute>} />

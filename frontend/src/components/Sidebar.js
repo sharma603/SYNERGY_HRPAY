@@ -2,7 +2,7 @@ import React from 'react';
 import { Nav } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
 import './Sidebar.css';
-
+// this
 function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse, user }) {
   const location = useLocation();
 
@@ -44,7 +44,7 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse, user }) {
           <span className="nav-text">Dashboard</span>
         </Link>
 
-        {(hasAccess('report-cost-allocation') || hasAccess('report-cost-allocation-month') || hasAccess('report-cost-allocation-filter') || hasAccess('report-annual-leave-exit-permit') || hasAccess('report-attendance-register') || hasAccess('report-employee-site-location')) && (
+        {(hasAccess('report-cost-allocation') || hasAccess('report-cost-allocation-month') || hasAccess('report-cost-allocation-filter') || hasAccess('report-annual-leave-exit-permit') || hasAccess('report-attendance-register') || hasAccess('report-attendance-register-all') || hasAccess('report-employee-site-location')) && (
           <>
             <div className="nav-section-label">Reports</div>
             {hasAccess('report-cost-allocation') && (
@@ -53,12 +53,7 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse, user }) {
                 <span className="nav-text">Cost Allocation</span>
               </Link>
             )}
-            {/* {hasAccess('report-cost-allocation-month') && (
-              <Link to="/reports/cost-allocation-month" onClick={onClose} title="Cost Allocation Month" className={`nav-link-custom ${isActive('/reports/cost-allocation-month') ? 'active' : ''}`}>
-                <span className="nav-icon"><i className="fa fa-calendar"></i></span>
-                <span className="nav-text">Cost Allocation Month</span>
-              </Link>
-            )} */}
+            
             {hasAccess('report-cost-allocation-filter') && (
               <Link to="/reports/cost-allocation-month-with-filter" onClick={onClose} title="Cost Allocation Filter" className={`nav-link-custom ${isActive('/reports/cost-allocation-month-with-filter') ? 'active' : ''}`}>
                 <span className="nav-icon"><i className="fa fa-filter"></i></span>
@@ -75,6 +70,12 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse, user }) {
               <Link to="/reports/attendance-register" onClick={onClose} title="Attendance Register" className={`nav-link-custom ${isActive('/reports/attendance-register') ? 'active' : ''}`}>
                 <span className="nav-icon"><i className="fa fa-clock-o"></i></span>
                 <span className="nav-text">Attendance Register</span>
+              </Link>
+            )}
+            {hasAccess('report-attendance-register-all') && (
+              <Link to="/reports/attendance-register-all" onClick={onClose} title="Attendance Register All" className={`nav-link-custom ${isActive('/reports/attendance-register-all') ? 'active' : ''}`}>
+                <span className="nav-icon"><i className="fa fa-clock-o"></i></span>
+                <span className="nav-text">Attendance Register All</span>
               </Link>
             )}
             {hasAccess('report-employee-site-location') && (

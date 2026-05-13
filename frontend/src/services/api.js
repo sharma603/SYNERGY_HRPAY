@@ -72,6 +72,8 @@ export const costAllocationAPI = {
   getDesignationSummaryWithFilters: (filters) => apiClient.post('/reports/designation-summary-filters', filters),
   getAnnualLeaveExitPermit: (filters) => apiClient.post('/reports/annual-leave-exit-permit', filters),
   getAttendanceRegister: (filters) => apiClient.post('/reports/attendance-register', filters),
+  getAttendanceRegisterAll: (filters) => apiClient.post('/reports/attendance-register-all', filters),
+  updateAttendanceStatus: (data) => apiClient.post('/reports/attendance-register-all/update-status', data),
   getEmployeeSiteLocation: (filters) => apiClient.post('/reports/employee-site-location', filters)
 };
 
