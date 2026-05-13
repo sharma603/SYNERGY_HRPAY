@@ -112,9 +112,22 @@ function AttendanceRegisterAll() {
      fetchReportData(1); 
    }, []); 
  
-   const handleSearch = () => { 
-     fetchReportData(1); 
-   }; 
+   const handleSearch = () => {
+    // Validate dates
+    if (filters.fromDate && filters.toDate) {
+      const from = new Date(filters.fromDate);
+      const to = new Date(filters.toDate);
+      if (isNaN(from.getTime()) || isNaN(to.getTime())) {
+        alert('Please enter valid dates');
+        return;
+      }
+      if (from > to) {
+        alert('From Date cannot be later than To Date');
+        return;
+      }
+    }
+    fetchReportData(1);
+  }; 
  
    const handlePageChange = (newPage) => { 
      if (newPage >= 1 && newPage <= pagination.totalPages) { 
@@ -255,8 +268,12 @@ function AttendanceRegisterAll() {
   };
 
   const handleSelectChange = (selectedOption, { name }) => {
-    const value = selectedOption ? selectedOption.value : '';
-    setFilters(prev => ({ ...prev, [name]: value }));
+    setFilters(prev => ({
+      ...prev,
+      [name]: name === 'empCode' 
+        ? (selectedOption ? selectedOption.map(opt => opt.value).join(',') : '')
+        : (selectedOption ? selectedOption.value : '')
+    }));
   };
 
   const clearFilters = () => {
@@ -478,6 +495,22 @@ function AttendanceRegisterAll() {
               onChange={handleSelectChange}
               options={masterData.attendanceStatuses?.map(s => ({ value: s.name, label: s.name })) || []}
               placeholder="All Status"
+              styles={customSelectStyles}
+              isClearable
+            />
+          </div>
+          <div className="col-md-3">
+            <label className="form-label fw-bold small text-muted text-uppercase">Employee</label>
+            <Select
+              isMulti
+              name="empCode"
+              value={filters.empCode ? filters.empCode.split(',').map(val => {
+                const emp = masterData.employees?.find(e => e.id.toString() === val.toString());
+                return emp ? { value: emp.id, label: `${emp.name} (${emp.code})` } : null;
+              }).filter(Boolean) : []}
+              onChange={(opt) => handleSelectChange(opt, { name: 'empCode' })}
+              options={masterData.employees?.map(e => ({ value: e.id, label: `${e.name} (${e.code})` })) || []}
+              placeholder="Select Employees..."
               styles={customSelectStyles}
               isClearable
             />

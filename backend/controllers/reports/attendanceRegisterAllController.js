@@ -55,6 +55,16 @@ const getAttendanceRegisterAll = async (req, res) => {
       LOCATION: locMap.get(record.RAW_EMPCODE) || record.LOCATION || '-'
     }));
 
+    // Sort by Date then Time ascending
+    mappedRecords.sort((a, b) => {
+      const dateA = new Date(a.DATE);
+      const dateB = new Date(b.DATE);
+      if (dateA - dateB !== 0) return dateA - dateB;
+      
+      // If same date, sort by time
+      return String(a.TIME).localeCompare(String(b.TIME));
+    });
+
     // Handle Status filtering in the backend since the SQL doesn't have the parameter
     if (status && status !== '') {
       mappedRecords = mappedRecords.filter(record => 
