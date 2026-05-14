@@ -31,7 +31,8 @@ function AttendanceRegisterAll() {
     empCode: '', 
     inout: '', 
     company: '',
-    status: ''
+    status: '',
+    lateOnly: false
   });
 
   const [masterData, setMasterData] = useState({
@@ -170,6 +171,24 @@ function AttendanceRegisterAll() {
       return allFilteredData.filter(row => row.STATUS === 'Absent');
     } else if (summaryType === 'Vacation') {
       return allFilteredData.filter(row => row.STATUS === 'Vacation' || row.STATUS === 'On Leave');
+    } else if (summaryType === 'Late') {
+      return allFilteredData.filter(row => {
+        // 1. Check if late (After 08:20)
+        const timeStr = String(row.TIME || '');
+        const isLate = timeStr > '08:20';
+        
+        // 2. Check if it's an entry (IN)
+        const dirStr = String(row.RAW_DIRECTION || row.DIRECTION || '').toUpperCase().trim();
+        const isEntry = dirStr === 'IN';
+
+        // 3. Check if status is Present
+        const statusStr = String(row.STATUS || '').toUpperCase().trim();
+        const isPresent = statusStr === 'PRESENT';
+
+        // Note: We don't check row.SECTION here because the backend already filters 
+        // by section if it was selected in the dropdown.
+        return isLate && isEntry && isPresent;
+      });
     }
     return [];
   };
@@ -287,8 +306,10 @@ function AttendanceRegisterAll() {
       empCode: '', 
       inout: '', 
       company: '',
-      status: ''
-    }); 
+      status: '',
+      lateOnly: false
+    });
+    setTimeout(() => handleSearch(), 100);
   };
 
   const exportToExcel = () => {
@@ -387,6 +408,33 @@ function AttendanceRegisterAll() {
       padding: '0 8px'
     })
   };
+// Handle late arrivals filter
+  const handleLateArrivals = async () => {
+    // 1. Ensure Section is set to STAFF A and status is Present
+    if (filters.section !== 'STAFF A') {
+      const newFilters = { ...filters, section: 'STAFF A' };
+      setFilters(newFilters);
+      
+      // 2. Fetch fresh data for this section
+      setLoading(true);
+      try {
+        const allResponse = await costAllocationAPI.getAttendanceRegisterAll({ 
+          ...newFilters, 
+          page: 1, 
+          limit: 1000000 
+        });
+        setAllFilteredData(allResponse.data.reportData || []);
+      } catch (err) {
+        console.error('Error fetching late arrivals:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    // 3. Open the modal
+    setSummaryModalType('Late');
+    setShowSummaryModal(true);
+  };
 
   return (
     <div className="premium-container">
@@ -404,6 +452,13 @@ function AttendanceRegisterAll() {
            </button>
            <button onClick={() => openSummaryModal('Vacation')} className="btn-premium btn-premium-info" disabled={reportData.length === 0}>
              <i className="fa fa-plane"></i> <span>Vacation List</span>
+           </button>
+           <button 
+             onClick={handleLateArrivals} 
+             className={`btn-premium ${filters.lateOnly ? 'btn-premium-primary' : 'btn-premium-secondary'}`} 
+             disabled={reportData.length === 0}
+           >
+             <i className="fa fa-clock-o"></i> <span>Late Arrivals (STAFF A)</span>
            </button>
            <button onClick={exportToExcel} className="btn-premium btn-premium-secondary" disabled={reportData.length === 0}>
             <i className="fa fa-file-excel-o"></i> <span>Export Excel</span>
@@ -630,8 +685,15 @@ function AttendanceRegisterAll() {
        {/* Summary Modal for Absent/Vacation */}
        <Modal show={showSummaryModal} onHide={() => setShowSummaryModal(false)} size="xl" centered scrollable>
          <Modal.Header closeButton style={{ backgroundColor: '#0F172A', color: 'white' }}>
-           <Modal.Title className="fw-bold">
-             {summaryType === 'Absent' ? 'Absent Employees List' : 'Vacation List'}
+           <Modal.Title className="fw-bold d-flex align-items-center justify-content-between w-100 me-3">
+             <span>
+               {summaryType === 'Absent' ? 'Absent Employees List' : 
+                summaryType === 'Vacation' ? 'Vacation List' : 
+                'Late Arrivals List (STAFF A) - After 08:20 AM'}
+             </span>
+             <span className="badge bg-danger ms-auto" style={{ fontSize: '0.9rem' }}>
+               Total: {getFilteredSummaryData().length}
+             </span>
            </Modal.Title>
          </Modal.Header>
          <Modal.Body className="p-0">

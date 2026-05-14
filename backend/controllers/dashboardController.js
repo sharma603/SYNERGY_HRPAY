@@ -37,6 +37,7 @@ const getDashboardStats = async (req, res) => {
       presentToday: 0,
       absentToday: 0,
       onVacationToday: 0,
+      lateArrivalsToday: 0,
       otherToday: 0
     };
 
@@ -46,6 +47,15 @@ const getDashboardStats = async (req, res) => {
       else if (status === 'absent') stats.absentToday++;
       else if (status === 'vacation' || status === 'on leave') stats.onVacationToday++;
       else stats.otherToday++;
+
+      // Check for Late Arrivals (STAFF A, after 08:20, IN)
+      const isStaffA = String(rec.SECTION || '').toUpperCase().trim() === 'STAFF A';
+      const isLate = String(rec.TIME || '') > '08:20';
+      const isEntry = String(rec.RAW_DIRECTION || rec.DIRECTION || '').toUpperCase().trim() === 'IN';
+      
+      if (isStaffA && isLate && isEntry) {
+        stats.lateArrivalsToday++;
+      }
     });
 
     // Get recent activities (Latest 5 leave requests)
@@ -74,6 +84,7 @@ const getDashboardStats = async (req, res) => {
       presentToday: stats.presentToday,
       absentToday: stats.absentToday,
       onVacationToday: stats.onVacationToday,
+      lateArrivalsToday: stats.lateArrivalsToday,
       otherToday: stats.otherToday,
       activities: activities
     });

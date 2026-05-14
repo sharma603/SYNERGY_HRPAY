@@ -15,6 +15,7 @@ function Home() {
     presentToday: 0,
     absentToday: 0,
     onVacationToday: 0,
+    lateArrivalsToday: 0,
     pendingLeaves: 0,
     totalAttendance: 0
   });
@@ -163,6 +164,17 @@ function Home() {
             <div className="premium-subtitle mb-2" style={{ textTransform: 'uppercase', fontSize: '0.7rem', fontWeight: 700 }}>On Vacation</div>
             <h2 className="mb-0" style={{ fontSize: '2.5rem', fontWeight: 800, color: '#3b82f6' }}>{stats.onVacationToday}</h2>
             <div className="mt-2" style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Currently on leave</div>
+          </div>
+        </Col>
+
+        <Col xl md={4} sm={6}>
+          <div className="premium-card text-center h-100 d-flex flex-column justify-content-center p-3 position-relative overflow-hidden" style={{ minHeight: '180px' }}>
+            <div className="position-absolute" style={{ top: '-10px', right: '-10px', opacity: 0.1, fontSize: '4rem', color: '#f59e0b' }}>
+              <i className="fa fa-clock-o"></i>
+            </div>
+            <div className="premium-subtitle mb-2" style={{ textTransform: 'uppercase', fontSize: '0.7rem', fontWeight: 700 }}>Late Comers</div>
+            <h2 className="mb-0" style={{ fontSize: '2.5rem', fontWeight: 800, color: '#f59e0b' }}>{stats.lateArrivalsToday}</h2>
+            <div className="mt-2" style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>After 08:20 AM</div>
           </div>
         </Col>
 

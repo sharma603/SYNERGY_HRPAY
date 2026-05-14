@@ -17,6 +17,7 @@ const getAttendanceRegisterAll = async (req, res) => {
       inout, 
       company, 
       status,
+      lateOnly,
       page = 1, 
       limit = 10 
     } = params; 
@@ -70,6 +71,14 @@ const getAttendanceRegisterAll = async (req, res) => {
       mappedRecords = mappedRecords.filter(record => 
         String(record.STATUS).toLowerCase() === String(status).toLowerCase()
       );
+    }
+
+    // Handle Late Arrivals (After 08:20)
+    if (lateOnly === true || lateOnly === 'true') {
+      mappedRecords = mappedRecords.filter(record => {
+        const isLate = String(record.TIME) > '08:20';
+        return isLate && String(record.DIRECTION).toUpperCase() === 'IN';
+      });
     }
 
     const totalRecords = mappedRecords.length; 
