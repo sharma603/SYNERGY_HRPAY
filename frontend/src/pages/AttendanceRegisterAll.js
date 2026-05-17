@@ -227,8 +227,8 @@ function AttendanceRegisterAll() {
 
   const exportSummaryExcel = () => {
     const data = getFilteredSummaryData();
-    const excelData = data.map(row => ({
-      "FINGER ID": row.RAW_FINGERID,
+    const excelData = data.map((row, index) => ({
+      "S/N": index + 1,
       "EMP CODE": row.RAW_EMPCODE,
       "EMPLOYEE NAME": row.EMP_NAME,
       "LOCATION": row.LOCATION || '-',
@@ -254,9 +254,9 @@ function AttendanceRegisterAll() {
     doc.setFontSize(10);
     doc.text(`Period: ${filters.fromDate} to ${filters.toDate}`, 14, 22);
 
-    const tableColumn = ["FINGER ID", "EMP CODE", "EMPLOYEE NAME", "LOCATION", "DATE", "TIME", "DIRECTION", "STATUS"];
-    const tableRows = data.map(row => [
-      row.RAW_FINGERID,
+    const tableColumn = ["S/N", "EMP CODE", "EMPLOYEE NAME", "LOCATION", "DATE", "TIME", "DIRECTION", "STATUS"];
+    const tableRows = data.map((row, index) => [
+      index + 1,
       row.RAW_EMPCODE,
       row.EMP_NAME,
       row.LOCATION || '-',
@@ -313,8 +313,8 @@ function AttendanceRegisterAll() {
   };
 
   const exportToExcel = () => {
-    const excelData = allFilteredData.map(row => ({
-      "FINGER ID": row.RAW_FINGERID,
+    const excelData = allFilteredData.map((row, index) => ({
+      "S/N": index + 1,
       "EMP CODE": row.RAW_EMPCODE,
       "EMPLOYEE NAME": row.EMP_NAME,
       "LOCATION": row.LOCATION || '-',
@@ -341,9 +341,9 @@ function AttendanceRegisterAll() {
     doc.text(`Period: ${filters.fromDate} to ${filters.toDate}`, 14, 22);
     doc.text(`Printed By: ${footerInfo?.PRINTEDUSER || 'System'} | Date: ${footerInfo?.DATE || ''}`, 14, 27);
 
-    const tableColumn = ["FINGER ID", "EMP CODE", "EMPLOYEE NAME", "LOCATION", "DATE", "TIME", "DIRECTION", "STATUS"];
-    const tableRows = allFilteredData.map(row => [
-      row.RAW_FINGERID,
+    const tableColumn = ["S/N", "EMP CODE", "EMPLOYEE NAME", "LOCATION", "DATE", "TIME", "DIRECTION", "STATUS"];
+    const tableRows = allFilteredData.map((row, index) => [
+      index + 1,
       row.RAW_EMPCODE,
       row.EMP_NAME,
       row.LOCATION || '-',

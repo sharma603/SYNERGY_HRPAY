@@ -162,12 +162,28 @@ const checkAndNotify = async (type = 'absent') => {
                                     <p style="color: #475569; line-height: 1.6; font-size: 16px;">
                                         ${settings.message.replace(/\n/g, '<br>')}
                                     </p>
-                                    <div style="background-color: #f8fafc; border-left: 4px solid #0F172A; padding: 20px; margin: 30px 0; border-radius: 0 8px 8px 0;">
+                                    <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #0F172A; padding: 20px; margin: 30px 0; border-radius: 8px;">
                                         <table style="width: 100%; font-size: 14px;">
-                                            <tr><td style="color: #64748b; width: 100px;">Employee ID:</td><td style="color: #1e293b; font-weight: 600;">${emp.EMP_Code}</td></tr>
-                                            <tr><td style="color: #64748b;">Date:</td><td style="color: #1e293b; font-weight: 600;">${new Date().toLocaleDateString()}</td></tr>
-                                            ${type === 'late' ? `<tr><td style="color: #64748b;">Check-In:</td><td style="color: #ef4444; font-weight: 600;">${attendanceMap.get(emp.EMP_Code)}</td></tr>` : ''}
+                                            <tr>
+                                                <td style="color: #64748b; width: 120px; font-weight: 500;">Employee ID :</td>
+                                                <td style="color: #1e293b; font-weight: 700;">${emp.EMP_Code}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="color: #64748b; font-weight: 500;">Record Date :</td>
+                                                <td style="color: #1e293b; font-weight: 700;">${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td>
+                                            </tr>
+                                            ${type === 'late' ? `
+                                            <tr>
+                                                <td style="color: #64748b; font-weight: 500;">Check-In Time :</td>
+                                                <td style="color: #ef4444; font-weight: 700;">${attendanceMap.get(emp.EMP_Code)}</td>
+                                            </tr>` : ''}
                                         </table>
+                                    </div>
+
+                                    <div style="margin-top: 30px; border-top: 1px solid #f1f5f9; padding-top: 20px;">
+                                        <p style="margin-bottom: 5px; color: #475569;">Regards,</p>
+                                        <p style="margin: 0; color: #1e293b; font-weight: 600;">HR Department</p>
+                                        <p style="margin: 0; color: #64748b; font-size: 14px;">${companyName}</p>
                                     </div>
                                 </div>
                                 <div style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">

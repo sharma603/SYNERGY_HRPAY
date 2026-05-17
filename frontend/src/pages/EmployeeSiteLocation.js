@@ -44,11 +44,10 @@ function EmployeeSiteLocation() {
     if (!dateStr) return '-';
     try {
       const date = new Date(dateStr);
-      return date.toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-      });
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
     } catch (e) {
       return dateStr;
     }
@@ -131,7 +130,8 @@ function EmployeeSiteLocation() {
       });
       const allData = response.data.reportData || [];
 
-      const exportData = allData.map(row => ({
+      const exportData = allData.map((row, index) => ({
+        'S/N': index + 1,
         'EMP CODE': row.EMP_CODE,
         'EMPLOYEE NAME': row.EMP_NAME,
         'NATIONALITY': row.Nationality || '-',
@@ -177,6 +177,7 @@ function EmployeeSiteLocation() {
       doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 22);
 
       const tableColumn = [
+        "S/N",
         "EMP CODE", 
         "NAME", 
         "NATIONALITY",
@@ -185,11 +186,12 @@ function EmployeeSiteLocation() {
         "DESIGNATION", 
         "SITE LOCATION",
         "PASSPORT",
-        "PASSPORT EXP",
-        "QID",
-        "QID EXP"
+        "PASSPORT EXPIRY",
+        "QATAR ID",
+        "QATAR ID EXPIRY"
       ];
-      const tableRows = allData.map(row => [
+      const tableRows = allData.map((row, index) => [
+        index + 1,
         row.EMP_CODE,
         row.EMP_NAME,
         row.Nationality || '-',
@@ -367,6 +369,7 @@ function EmployeeSiteLocation() {
             <table className="table-premium">
               <thead>
                 <tr>
+                  <th>S/N</th>
                   <th>EMP CODE</th>
                   <th>EMPLOYEE NAME</th>
                   <th>NATIONALITY</th>
@@ -374,13 +377,16 @@ function EmployeeSiteLocation() {
                   <th>DEPARTMENT</th>
                   <th>DESIGNATION</th>
                   <th>SITE LOCATION</th>
-                  <th>PASSPORT & EXPIRY</th>
-                  <th>QID & EXPIRY</th>
+                  <th>PASSPORT</th>
+                  <th>PASSPORT EXPIRY</th>
+                  <th>QATAR ID</th>
+                  <th>QATAR ID EXPIRY</th>
                 </tr>
               </thead>
               <tbody>
                 {reportData.map((row, index) => (
                   <tr key={index}>
+                    <td>{(pagination.page - 1) * pagination.limit + index + 1}</td>
                     <td>{row.EMP_CODE}</td>
                     <td className="fw-bold">{row.EMP_NAME}</td>
                     <td>{row.Nationality || '-'}</td>
@@ -392,18 +398,10 @@ function EmployeeSiteLocation() {
                         {row.Site_Location || 'Not Assigned'}
                       </span>
                     </td>
-                    <td>
-                      <div className="small fw-bold text-dark">{row.Passport || '-'}</div>
-                      <div className="text-muted" style={{ fontSize: '0.75rem' }}>
-                        Exp: {formatDate(row['Passport Expiry'])}
-                      </div>
-                    </td>
-                    <td>
-                      <div className="small fw-bold text-dark">{row['Qatar ID'] || '-'}</div>
-                      <div className="text-muted" style={{ fontSize: '0.75rem' }}>
-                        Exp: {formatDate(row['Qatar ID Expiry'])}
-                      </div>
-                    </td>
+                    <td>{row.Passport || '-'}</td>
+                    <td>{formatDate(row['Passport Expiry'])}</td>
+                    <td>{row['Qatar ID'] || '-'}</td>
+                    <td>{formatDate(row['Qatar ID Expiry'])}</td>
                   </tr>
                 ))}
               </tbody>

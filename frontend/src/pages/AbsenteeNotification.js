@@ -40,7 +40,7 @@ function AbsenteeNotification() {
       department: '',
       section: '',
       subject: 'Absence Notification',
-      message: 'We noticed you were absent today without prior notice. Please provide a reason for your absence as soon as possible.'
+      message: "Hope you're doing well,\n\nWe have noticed that you were absent today without prior notice.\n\nIf you have missed your check-in or were on official duty outside the office, kindly ensure that your attendance is registered or your leave request (according to the applicable leave type) is submitted through the system to avoid the day being recorded as an absence.\n\nThank you for your cooperation, and we wish you a pleasant day."
     },
     late: {
       enabled: false,
@@ -50,8 +50,8 @@ function AbsenteeNotification() {
       section: '',
       lateThreshold: '08:20',
       sectionRules: [], // [{ section: 'STAFF A', time: '08:00' }]
-      subject: 'Late Arrival Notification',
-      message: 'We noticed that you arrived late today. Your check-in time was recorded as shown below. Please ensure you are on time as per your shift schedule.'
+      subject: 'Late Check-in',
+      message: "Based on today’s attendance records, your official working hours commence at 08:00 AM. However, the system indicates that your check-in was recorded as follows:\n\nWe trust that this delay was due to a valid reason and hope everything is well. In accordance with company attendance policy, kindly coordinate with your direct manager to provide the necessary clarification or approval, if applicable."
     }
   });
 
@@ -60,11 +60,11 @@ function AbsenteeNotification() {
   const [broadcastData, setBroadcastData] = useState({
     absent: {
       subject: 'Absence Notification',
-      message: 'We noticed you were absent today without prior notice. Please provide a reason for your absence as soon as possible.'
+      message: "Hope you're doing well,\n\nWe have noticed that you were absent today without prior notice.\n\nIf you have missed your check-in or were on official duty outside the office, kindly ensure that your attendance is registered or your leave request (according to the applicable leave type) is submitted through the system to avoid the day being recorded as an absence.\n\nThank you for your cooperation, and we wish you a pleasant day."
     },
     late: {
-      subject: 'Late Arrival Notification',
-      message: 'We noticed that you arrived late today. Your check-in time was recorded as shown below. Please ensure you are on time as per your shift schedule.'
+      subject: 'Late Check-in',
+      message: "Based on today’s attendance records, your official working hours commence at 08:00 AM. However, the system indicates that your check-in was recorded as follows:\n\nWe trust that this delay was due to a valid reason and hope everything is well. In accordance with company attendance policy, kindly coordinate with your direct manager to provide the necessary clarification or approval, if applicable."
     }
   });
 
@@ -97,8 +97,8 @@ function AbsenteeNotification() {
             message: response.data.absent?.message || 'We noticed you were absent today without prior notice.'
           },
           late: {
-            subject: response.data.late?.subject || 'Late Arrival Notification',
-            message: response.data.late?.message || 'We noticed that you arrived late today.'
+            subject: response.data.late?.subject || 'Late Check-in',
+            message: response.data.late?.message || "Based on today’s attendance records, your official working hours commence at 08:00 AM. However, the system indicates that your check-in was recorded as follows:\n\nWe trust that this delay was due to a valid reason and hope everything is well. In accordance with company attendance policy, kindly coordinate with your direct manager to provide the necessary clarification or approval, if applicable."
           }
         });
       }

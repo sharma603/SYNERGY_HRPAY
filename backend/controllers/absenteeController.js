@@ -190,32 +190,36 @@ const sendBulkNotifications = async (req, res) => {
                 
                 <h2 style="color: #1e293b; margin: 0 0 20px 0; font-size: 20px;">Dear ${emp.EMP_Name},</h2>
                 
-                <div style="color: #475569; line-height: 1.6; font-size: 16px;">
-                  <p style="margin-bottom: 20px;">
-                    ${message.replace(/\n/g, '<br>')}
-                  </p>
-                  
-                  <div style="background-color: #f8fafc; border-left: 4px solid #0F172A; padding: 20px; margin: 30px 0; border-radius: 0 8px 8px 0;">
-                    <table style="width: 100%; font-size: 14px; border-collapse: collapse;">
-                      <tr>
-                        <td style="color: #64748b; padding-bottom: 8px; width: 100px;">Employee ID:</td>
-                        <td style="color: #1e293b; font-weight: 600; padding-bottom: 8px;">${emp.EMP_Code}</td>
-                      </tr>
-                      <tr>
-                        <td style="color: #64748b; ${emp.CHECK_IN ? 'padding-bottom: 8px;' : ''}">Record Date:</td>
-                        <td style="color: #1e293b; font-weight: 600; ${emp.CHECK_IN ? 'padding-bottom: 8px;' : ''}">${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td>
-                      </tr>
-                      ${emp.CHECK_IN ? `
-                      <tr>
-                        <td style="color: #64748b;">Check-In Time:</td>
-                        <td style="color: #ef4444; font-weight: 600;">${emp.CHECK_IN}</td>
-                      </tr>
-                      ` : ''}
-                    </table>
+                  <div style="color: #475569; line-height: 1.6; font-size: 16px;">
+                    <p style="margin-bottom: 25px;">
+                      ${message.replace(/\n/g, '<br>')}
+                    </p>
+                    
+                    <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #0F172A; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                      <table style="width: 100%; font-size: 14px; border-collapse: collapse;">
+                        <tr>
+                          <td style="color: #64748b; padding-bottom: 10px; width: 120px; font-weight: 500;">Employee ID :</td>
+                          <td style="color: #1e293b; font-weight: 700; padding-bottom: 10px;">${emp.EMP_Code}</td>
+                        </tr>
+                        <tr>
+                          <td style="color: #64748b; ${emp.CHECK_IN ? 'padding-bottom: 10px;' : ''} font-weight: 500;">Record Date :</td>
+                          <td style="color: #1e293b; font-weight: 700; ${emp.CHECK_IN ? 'padding-bottom: 10px;' : ''}">${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td>
+                        </tr>
+                        ${emp.CHECK_IN ? `
+                        <tr>
+                          <td style="color: #64748b; font-weight: 500;">Check-In Time :</td>
+                          <td style="color: #ef4444; font-weight: 700;">${emp.CHECK_IN}</td>
+                        </tr>
+                        ` : ''}
+                      </table>
+                    </div>
+                    
+                    <div style="margin-top: 30px; border-top: 1px solid #f1f5f9; padding-top: 20px;">
+                      <p style="margin-bottom: 5px; color: #475569;">Regards,</p>
+                      <p style="margin: 0; color: #1e293b; font-weight: 600;">HR Department</p>
+                      <p style="margin: 0; color: #64748b; font-size: 14px;">${companyName}</p>
+                    </div>
                   </div>
-                  
-                  <p style="margin-bottom: 0;">If this is a mistake or if you have already submitted a leave request, please contact the HR Department immediately.</p>
-                </div>
               </div>
               
               <!-- Footer -->

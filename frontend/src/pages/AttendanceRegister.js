@@ -139,8 +139,8 @@ import React, { useState, useEffect, useCallback } from 'react';
        }); 
        const allData = response.data.reportData || []; 
        
-       const excelData = allData.map(row => ({ 
-         "FINGER ID": row.RAW_FINGERID, 
+       const excelData = allData.map((row, index) => ({ 
+         "S/N": index + 1, 
          "EMP CODE": row.RAW_EMPCODE, 
          "EMPLOYEE NAME": row.EMP_NAME, 
          "LOCATION": row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-', 
@@ -181,9 +181,9 @@ import React, { useState, useEffect, useCallback } from 'react';
        doc.text(`Period: ${filters.fromDate} to ${filters.toDate}`, 14, 22); 
        doc.text(`Printed By: ${footerInfo?.PRINTEDUSER || 'System'} | Date: ${footerInfo?.DATE || ''}`, 14, 27); 
  
-       const tableColumn = ["FINGER ID", "EMP CODE", "EMPLOYEE NAME", "LOCATION", "DATE", "CHECK IN", "CHECK OUT", "DIRECTION"]; 
-       const tableRows = allData.map(row => [ 
-         row.RAW_FINGERID, 
+       const tableColumn = ["S/N", "EMP CODE", "EMPLOYEE NAME", "LOCATION", "DATE", "CHECK IN", "CHECK OUT", "DIRECTION"]; 
+       const tableRows = allData.map((row, index) => [ 
+         index + 1, 
          row.RAW_EMPCODE, 
          row.EMP_NAME, 
          row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-', 
@@ -368,7 +368,7 @@ import React, { useState, useEffect, useCallback } from 'react';
              <table className="table-premium"> 
                <thead> 
                  <tr> 
-                   <th>FINGER ID</th> 
+                   <th>S/N</th> 
                    <th>EMP CODE</th> 
                    <th>EMPLOYEE NAME</th> 
                    <th>LOCATION</th> 
@@ -381,7 +381,7 @@ import React, { useState, useEffect, useCallback } from 'react';
                <tbody> 
                  {reportData.map((row, index) => ( 
                    <tr key={index}> 
-                     <td>{row.RAW_FINGERID}</td> 
+                     <td>{index + 1}</td> 
                      <td>{row.RAW_EMPCODE}</td> 
                      <td className="fw-bold">{row.EMP_NAME}</td> 
                      <td>{row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-'}</td> 
