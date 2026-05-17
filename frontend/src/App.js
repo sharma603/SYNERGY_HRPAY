@@ -16,6 +16,8 @@ import EmployeeSiteLocation from './pages/EmployeeSiteLocation';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import UserRoles from './pages/UserRoles';
+import MessageBroadcast from './pages/MessageBroadcast';
+import AbsenteeNotification from './pages/AbsenteeNotification';
 
 import Login from './pages/Login';
 import './App.css';
@@ -125,6 +127,8 @@ function App() {
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute pageId="settings"><Settings /></ProtectedRoute>} />
               <Route path="/user-roles" element={<ProtectedRoute pageId="user-roles" allowedRoles={['admin']}><UserRoles /></ProtectedRoute>} />
+              <Route path="/message-broadcast" element={<ProtectedRoute pageId="message-broadcast" allowedRoles={['admin']}><MessageBroadcast /></ProtectedRoute>} />
+              <Route path="/absentee-notification" element={<ProtectedRoute pageId="absentee-notification" allowedRoles={['admin']}><AbsenteeNotification /></ProtectedRoute>} />
               <Route path="/login" element={<Login />} />
             </Routes>
           </Container>

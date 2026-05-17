@@ -29,7 +29,7 @@ const getAllEmployees = async (req, res) => {
 
     const result = await request.query(`
       SELECT 
-        e.EMP_Slno, e.EMP_Code, e.EMP_Name, e.EMP_IMAGE, 
+        e.EMP_Slno, e.EMP_Code, e.EMP_Name, e.EMP_IMAGE, e.EMP_EMAIL,
         loc.COM_DESC as EMP_LOC_DR, e.EMP_LOC_DR as EMP_LOC_DR_ID,
         dept.COM_DESC as EMP_DEPT_DR, e.EMP_DEPT_DR as EMP_DEPT_DR_ID,
         desig.COM_DESC as EMP_DESIG_DR, e.EMP_DESIG_DR as EMP_DESIG_DR_ID,
@@ -89,7 +89,7 @@ const getEmployeeById = async (req, res) => {
       .input('id', id)
       .query(`
         SELECT 
-          e.EMP_Slno, e.EMP_Code, e.EMP_Name, e.EMP_IMAGE,
+          e.EMP_Slno, e.EMP_Code, e.EMP_Name, e.EMP_IMAGE, e.EMP_EMAIL,
           loc.COM_DESC as EMP_LOC_DR, e.EMP_LOC_DR as EMP_LOC_DR_ID,
           dept.COM_DESC as EMP_DEPT_DR, e.EMP_DEPT_DR as EMP_DEPT_DR_ID,
           desig.COM_DESC as EMP_DESIG_DR, e.EMP_DESIG_DR as EMP_DESIG_DR_ID,
@@ -131,7 +131,7 @@ const getEmployeeById = async (req, res) => {
 const createEmployee = async (req, res) => {
   try {
     const { 
-      EMP_Code, EMP_Name, EMP_LOC_DR, EMP_DEPT_DR, EMP_DESIG_DR, 
+      EMP_Code, EMP_Name, EMP_EMAIL, EMP_LOC_DR, EMP_DEPT_DR, EMP_DESIG_DR, 
       EMP_DOB, EMP_NATION_DR, EMP_RELIGION_DR, EMP_PREV_ID, 
       EMP_JOIN_DATE, EMP_ADDRESS, EMP_LAB_NO, EMP_MOL_NO, 
       EMP_OT_DR, EMP_BANK_DR, EMP_BRANCH, EMP_AC_NO, 
@@ -151,6 +151,7 @@ const createEmployee = async (req, res) => {
       .input('Slno', sql.Int, nextSlno)
       .input('Code', sql.NVarChar, EMP_Code)
       .input('Name', sql.NVarChar, EMP_Name)
+      .input('Email', sql.NVarChar, EMP_EMAIL || null)
       .input('Image', sql.VarBinary(sql.MAX), image)
       .input('Loc', sql.Int, EMP_LOC_DR || null)
       .input('Dept', sql.Int, EMP_DEPT_DR || null)
@@ -171,12 +172,12 @@ const createEmployee = async (req, res) => {
       .input('UniqCode', sql.NVarChar, EMP_UNIQ_CODE || null)
       .query(`
         INSERT INTO HRM_EMP_MASTER (
-          EMP_Slno, EMP_Code, EMP_Name, EMP_IMAGE, EMP_LOC_DR, EMP_DEPT_DR, EMP_DESIG_DR, 
+          EMP_Slno, EMP_Code, EMP_Name, EMP_EMAIL, EMP_IMAGE, EMP_LOC_DR, EMP_DEPT_DR, EMP_DESIG_DR, 
           EMP_DOB, EMP_NATION_DR, EMP_RELIGION_DR, EMP_PREV_ID, EMP_JOIN_DATE, 
           EMP_ADDRESS, EMP_LAB_NO, EMP_MOL_NO, EMP_OT_DR, EMP_BANK_DR, 
           EMP_BRANCH, EMP_AC_NO, EMP_SWIFT_CODE, EMP_UNIQ_CODE, emp_stat_flag
         ) VALUES (
-          @Slno, @Code, @Name, @Image, @Loc, @Dept, @Desig, 
+          @Slno, @Code, @Name, @Email, @Image, @Loc, @Dept, @Desig, 
           @DOB, @Nation, @Religion, @PrevId, @JoinDate, 
           @Address, @LabNo, @MolNo, @Ot, @Bank, 
           @Branch, @AcNo, @Swift, @UniqCode, 1
@@ -195,7 +196,7 @@ const updateEmployee = async (req, res) => {
   try {
     const { id } = req.params;
     const { 
-      EMP_Code, EMP_Name, EMP_LOC_DR, EMP_DEPT_DR, EMP_DESIG_DR, 
+      EMP_Code, EMP_Name, EMP_EMAIL, EMP_LOC_DR, EMP_DEPT_DR, EMP_DESIG_DR, 
       EMP_DOB, EMP_NATION_DR, EMP_RELIGION_DR, EMP_PREV_ID, 
       EMP_JOIN_DATE, EMP_ADDRESS, EMP_LAB_NO, EMP_MOL_NO, 
       EMP_OT_DR, EMP_BANK_DR, EMP_BRANCH, EMP_AC_NO, 
@@ -208,7 +209,7 @@ const updateEmployee = async (req, res) => {
     
     let query = `
       UPDATE HRM_EMP_MASTER 
-      SET EMP_Code=@Code, EMP_Name=@Name, EMP_LOC_DR=@Loc, 
+      SET EMP_Code=@Code, EMP_Name=@Name, EMP_EMAIL=@Email, EMP_LOC_DR=@Loc, 
           EMP_DEPT_DR=@Dept, EMP_DESIG_DR=@Desig, EMP_DOB=@DOB, 
           EMP_NATION_DR=@Nation, EMP_RELIGION_DR=@Religion, 
           EMP_PREV_ID=@PrevId, EMP_JOIN_DATE=@JoinDate, 
@@ -221,6 +222,7 @@ const updateEmployee = async (req, res) => {
       .input('id', sql.Int, id)
       .input('Code', sql.NVarChar, EMP_Code)
       .input('Name', sql.NVarChar, EMP_Name)
+      .input('Email', sql.NVarChar, EMP_EMAIL || null)
       .input('Loc', sql.Int, EMP_LOC_DR || null)
       .input('Dept', sql.Int, EMP_DEPT_DR || null)
       .input('Desig', sql.Int, EMP_DESIG_DR || null)

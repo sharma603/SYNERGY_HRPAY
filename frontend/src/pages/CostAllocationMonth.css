@@ -2,7 +2,7 @@
 .multi-select-dropdown-wrapper {
   width: 100%;
 }
-
+/* this */
 .multi-select-dropdown-panel {
   position: absolute;
   top: calc(100% + 4px);

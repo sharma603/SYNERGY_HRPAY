@@ -214,10 +214,10 @@ import React, { useState, useEffect, useCallback } from 'react';
      control: (base, state) => ({ 
        ...base, 
        borderRadius: '8px', 
-       borderColor: state.isFocused ? 'var(--primary-color)' : '#dee2e6', 
-       boxShadow: state.isFocused ? '0 0 0 1px var(--primary-color)' : 'none', 
+       borderColor: state.isFocused ? '#1a1a1a' : '#dee2e6', 
+       boxShadow: state.isFocused ? '0 0 0 1px #1a1a1a' : 'none', 
        '&:hover': { 
-         borderColor: state.isFocused ? 'var(--primary-color)' : '#ced4da' 
+         borderColor: state.isFocused ? '#1a1a1a' : '#ced4da' 
        }, 
        fontSize: '0.875rem', 
        minHeight: '31px', 
@@ -226,10 +226,10 @@ import React, { useState, useEffect, useCallback } from 'react';
      option: (base, state) => ({ 
        ...base, 
        fontSize: '0.875rem', 
-       backgroundColor: state.isSelected ? 'var(--primary-color)' : state.isFocused ? 'rgba(79, 70, 229, 0.05)' : 'white', 
+       backgroundColor: state.isSelected ? '#1a1a1a' : state.isFocused ? 'rgba(26, 26, 26, 0.05)' : 'white', 
        color: state.isSelected ? 'white' : 'var(--text-main)', 
        '&:active': { 
-         backgroundColor: 'var(--primary-color)' 
+         backgroundColor: '#1a1a1a' 
        } 
      }), 
      placeholder: (base) => ({ 
@@ -263,10 +263,10 @@ import React, { useState, useEffect, useCallback } from 'react';
          </div> 
          <div className="d-flex gap-2"> 
            <button onClick={exportToExcel} className="btn-premium btn-premium-secondary" disabled={reportData.length === 0}> 
-             <i className="fa fa-file-excel-o"></i> <span>Export Excel</span> 
+             <i className="fa fa-file-excel-o text-dark"></i> <span>Excel</span> 
            </button> 
            <button onClick={exportToPDF} className="btn-premium btn-premium-secondary" disabled={reportData.length === 0}> 
-             <i className="fa fa-file-pdf-o"></i> <span>Export PDF</span> 
+             <i className="fa fa-file-pdf-o text-dark"></i> <span>PDF</span> 
            </button> 
          </div> 
        </div> 
@@ -275,13 +275,11 @@ import React, { useState, useEffect, useCallback } from 'react';
          <div className="row g-3"> 
            <div className="col-md-4"> 
              <label className="form-label fw-bold small text-muted text-uppercase">From Date</label> 
-             <input type="date" name="fromDate" value={filters.fromDate} onChange={handleFilterChange} className="form-control form-control-sm" placeholder="dd-mm-yyyy" /> 
-             <div className="form-text text-muted mt-1" style={{ fontSize: '0.7rem' }}>You can type or use the picker</div> 
+             <input type="date" name="fromDate" value={filters.fromDate} onChange={handleFilterChange} className="form-control form-control-sm border-gray-200" placeholder="dd-mm-yyyy" /> 
            </div> 
            <div className="col-md-4"> 
              <label className="form-label fw-bold small text-muted text-uppercase">To Date</label> 
-             <input type="date" name="toDate" value={filters.toDate} onChange={handleFilterChange} className="form-control form-control-sm" placeholder="dd-mm-yyyy" /> 
-             <div className="form-text text-muted mt-1" style={{ fontSize: '0.7rem' }}>You can type or use the picker</div> 
+             <input type="date" name="toDate" value={filters.toDate} onChange={handleFilterChange} className="form-control form-control-sm border-gray-200" placeholder="dd-mm-yyyy" /> 
            </div> 
            <div className="col-md-4"> 
              <label className="form-label fw-bold small text-muted text-uppercase">Department</label> 
@@ -347,7 +345,7 @@ import React, { useState, useEffect, useCallback } from 'react';
              /> 
            </div> 
            <div className="col-md-8 d-flex align-items-end gap-2"> 
-             <button onClick={handleSearch} className="btn-premium btn-premium-primary px-4" disabled={loading}> 
+             <button onClick={handleSearch} className="btn-premium btn-premium-dark px-4" disabled={loading}> 
                {loading ? <span className="spinner-border spinner-border-sm"></span> : <><i className="fa fa-search"></i> Search</>} 
              </button> 
              <button onClick={clearFilters} className="btn-premium btn-premium-secondary px-4"> 
@@ -391,7 +389,7 @@ import React, { useState, useEffect, useCallback } from 'react';
                      <td>{row.CHECK_IN || '-'}</td> 
                      <td>{row.CHECK_OUT || '-'}</td> 
                      <td> 
-                       <span className={`badge-premium ${row.RAW_DIRECTION === 'IN' ? 'badge-premium-green' : 'badge-premium-red'}`}> 
+                       <span className={`badge-premium ${row.RAW_DIRECTION === 'IN' ? 'badge-premium-dark' : 'badge-premium-gray'}`}> 
                          {row.RAW_DIRECTION} 
                        </span> 
                      </td> 

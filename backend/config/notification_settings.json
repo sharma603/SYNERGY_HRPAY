@@ -1,0 +1,43 @@
+{
+  "absent": {
+    "enabled": true,
+    "time": "12:48",
+    "days": [
+      1,
+      2,
+      3,
+      4,
+      0
+    ],
+    "subject": "Absence Notification",
+    "message": "We noticed you were absent today without prior notice. Please provide a reason for your absence as soon as possible.",
+    "department": "ADMIN",
+    "section": "STAFF A"
+  },
+  "late": {
+    "enabled": true,
+    "time": "09:00",
+    "days": [
+      1,
+      2,
+      3,
+      4,
+      0
+    ],
+    "lateThreshold": "08:20",
+    "sectionRules": [
+      {
+        "section": "STAFF A",
+        "time": "08:20"
+      },
+      {
+        "section": "STAFF B",
+        "time": "11:20"
+      }
+    ],
+    "subject": "Late Arrival Notification",
+    "message": "We noticed that you arrived late today. Your check-in time was recorded as shown below. Please ensure you are on time as per your shift schedule.",
+    "department": "ADMIN",
+    "section": "STAFF A"
+  }
+}

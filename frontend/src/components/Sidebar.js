@@ -87,7 +87,7 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse, user }) {
           </>
         )}
         
-        {(hasAccess('user-roles') || hasAccess('employees')) && (
+        {(hasAccess('user-roles') || hasAccess('employees') || hasAccess('message-broadcast')) && (
           <>
             <div className="nav-section-label">Management</div>
             {hasAccess('user-roles') && (
@@ -100,6 +100,18 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse, user }) {
               <Link to="/employees" onClick={onClose} title="Employees" className={`nav-link-custom ${isActive('/employees') ? 'active' : ''}`}>
                 <span className="nav-icon"><i className="fa fa-users"></i></span>
                 <span className="nav-text">Employees</span>
+              </Link>
+            )}
+            {hasAccess('message-broadcast') && (
+              <Link to="/message-broadcast" onClick={onClose} title="Message Broadcast" className={`nav-link-custom ${isActive('/message-broadcast') ? 'active' : ''}`}>
+                <span className="nav-icon"><i className="fa fa-bullhorn"></i></span>
+                <span className="nav-text">Message Broadcast</span>
+              </Link>
+            )}
+            {hasAccess('absentee-notification') && (
+              <Link to="/absentee-notification" onClick={onClose} title="Absentee Notification" className={`nav-link-custom ${isActive('/absentee-notification') ? 'active' : ''}`}>
+                <span className="nav-icon"><i className="fa fa-user-times text-danger"></i></span>
+                <span className="nav-text">Absentee Notification</span>
               </Link>
             )}
           </>

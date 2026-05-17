@@ -5,7 +5,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { costAllocationAPI, authAPI } from '../services/api';
 import '../PremiumTheme.css';
-
+// this
 function EmployeeSiteLocation() {
   const [reportData, setReportData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -134,11 +134,16 @@ function EmployeeSiteLocation() {
       const exportData = allData.map(row => ({
         'EMP CODE': row.EMP_CODE,
         'EMPLOYEE NAME': row.EMP_NAME,
+        'NATIONALITY': row.Nationality || '-',
         'JOIN DATE': formatDate(row.EMP_JOIN_DATE),
         'DEPARTMENT': row.Department,
         'DESIGNATION': row.Designation,
         'SECTION': row.Section,
-        'SITE LOCATION': row.Site_Location
+        'SITE LOCATION': row.Site_Location,
+        'PASSPORT': row.Passport || '-',
+        'PASSPORT EXPIRY': formatDate(row['Passport Expiry']),
+        'QATAR ID': row['Qatar ID'] || '-',
+        'QATAR ID EXPIRY': formatDate(row['Qatar ID Expiry'])
       }));
 
       const ws = XLSX.utils.json_to_sheet(exportData);
@@ -171,16 +176,32 @@ function EmployeeSiteLocation() {
       doc.setTextColor(100);
       doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 22);
 
-      const tableColumn = ["EMP CODE", "NAME", "JOIN DATE", "DEPARTMENT", "DESIGNATION", "SECTION", "SITE LOCATION"];
+      const tableColumn = [
+        "EMP CODE", 
+        "NAME", 
+        "NATIONALITY",
+        "JOIN DATE", 
+        "DEPARTMENT", 
+        "DESIGNATION", 
+        "SITE LOCATION",
+        "PASSPORT",
+        "PASSPORT EXP",
+        "QID",
+        "QID EXP"
+      ];
       const tableRows = allData.map(row => [
         row.EMP_CODE,
         row.EMP_NAME,
+        row.Nationality || '-',
         formatDate(row.EMP_JOIN_DATE),
         row.Department,
         row.Designation,
-        row.Section,
-        row.Site_Location
-  ]);
+        row.Site_Location,
+        row.Passport || '-',
+        formatDate(row['Passport Expiry']),
+        row['Qatar ID'] || '-',
+        formatDate(row['Qatar ID Expiry'])
+      ]);
 
   const handleLimitChange = (e) => {
     const newLimit = e.target.value === 'all' ? 1000000 : parseInt(e.target.value);
@@ -348,11 +369,13 @@ function EmployeeSiteLocation() {
                 <tr>
                   <th>EMP CODE</th>
                   <th>EMPLOYEE NAME</th>
+                  <th>NATIONALITY</th>
                   <th>JOIN DATE</th>
                   <th>DEPARTMENT</th>
                   <th>DESIGNATION</th>
-                  <th>SECTION</th>
                   <th>SITE LOCATION</th>
+                  <th>PASSPORT & EXPIRY</th>
+                  <th>QID & EXPIRY</th>
                 </tr>
               </thead>
               <tbody>
@@ -360,14 +383,26 @@ function EmployeeSiteLocation() {
                   <tr key={index}>
                     <td>{row.EMP_CODE}</td>
                     <td className="fw-bold">{row.EMP_NAME}</td>
+                    <td>{row.Nationality || '-'}</td>
                     <td>{formatDate(row.EMP_JOIN_DATE)}</td>
                     <td>{row.Department}</td>
                     <td>{row.Designation}</td>
-                    <td>{row.Section}</td>
                     <td>
                       <span className="badge-premium badge-premium-blue">
                         {row.Site_Location || 'Not Assigned'}
                       </span>
+                    </td>
+                    <td>
+                      <div className="small fw-bold text-dark">{row.Passport || '-'}</div>
+                      <div className="text-muted" style={{ fontSize: '0.75rem' }}>
+                        Exp: {formatDate(row['Passport Expiry'])}
+                      </div>
+                    </td>
+                    <td>
+                      <div className="small fw-bold text-dark">{row['Qatar ID'] || '-'}</div>
+                      <div className="text-muted" style={{ fontSize: '0.75rem' }}>
+                        Exp: {formatDate(row['Qatar ID Expiry'])}
+                      </div>
                     </td>
                   </tr>
                 ))}

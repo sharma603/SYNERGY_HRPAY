@@ -52,7 +52,23 @@ export const employeeAPI = {
 export const attendanceAPI = {
   getAll: () => apiClient.get('/attendance'),
   create: (data) => apiClient.post('/attendance', data),
-  update: (id, data) => apiClient.put(`/attendance/${id}`, data)
+  update: (id, data) => apiClient.put(`/attendance/${id}`, data),
+  getAbsentees: (date, page = 1, limit = 10, type = 'absent', lateThreshold = '08:20', section = '', department = '', sectionRules = []) => 
+    apiClient.get('/absentees', { 
+      params: { 
+        date, 
+        page, 
+        limit, 
+        type, 
+        lateThreshold, 
+        section, 
+        department,
+        sectionRules: JSON.stringify(sectionRules)
+      } 
+    }),
+  notifyAbsentees: (data) => apiClient.post('/absentees/notify', data),
+  getAbsenteeSettings: () => apiClient.get('/absentees/settings'),
+  updateAbsenteeSettings: (data) => apiClient.post('/absentees/settings', data)
 };
 
 // Leaves APIs
@@ -93,6 +109,11 @@ export const authAPI = {
 // Dashboard APIs
 export const dashboardAPI = {
   getStats: () => apiClient.get('/dashboard/stats')
+};
+
+// Email APIs
+export const emailAPI = {
+  send: (data) => apiClient.post('/email/send', data)
 };
 
 export default apiClient;

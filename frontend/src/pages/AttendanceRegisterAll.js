@@ -206,12 +206,12 @@ function AttendanceRegisterAll() {
     })).sort((a, b) => b.value - a.value);
   };
 
-  const CHART_COLORS = {
-    'Present': '#10b981', // Emerald
-    'Absent': '#f43f5e',  // Rose
-    'Vacation': '#3b82f6', // Blue
-    'On Leave': '#8b5cf6', // Violet
-    'Holiday': '#f59e0b',  // Amber
+   const CHART_COLORS = {
+    'Present': '#1a1a1a', // Black
+    'Absent': '#666666',  // Gray
+    'Vacation': '#333333', // Dark Gray
+    'On Leave': '#444444', // Medium Gray
+    'Holiday': '#888888',  // Light Gray
     'Unknown': '#94a3b8'   // Slate
   };
 
@@ -444,27 +444,27 @@ function AttendanceRegisterAll() {
           <p className="premium-subtitle">Full attendance logs with advanced filtering</p>
         </div>
         <div className="d-flex gap-2"> 
-           <button onClick={() => setShowAttendanceSummary(true)} className="btn-premium btn-premium-primary" disabled={reportData.length === 0}>
+           <button onClick={() => setShowAttendanceSummary(true)} className="btn-premium btn-premium-dark" disabled={reportData.length === 0}>
              <i className="fa fa-pie-chart"></i> <span>Attendance Summary</span>
            </button>
-           <button onClick={() => openSummaryModal('Absent')} className="btn-premium btn-premium-danger" disabled={reportData.length === 0}>
-             <i className="fa fa-user-times"></i> <span>Absent List</span>
+           <button onClick={() => openSummaryModal('Absent')} className="btn-premium btn-premium-secondary" disabled={reportData.length === 0}>
+             <i className="fa fa-user-times text-danger"></i> <span>Absent List</span>
            </button>
-           <button onClick={() => openSummaryModal('Vacation')} className="btn-premium btn-premium-info" disabled={reportData.length === 0}>
-             <i className="fa fa-plane"></i> <span>Vacation List</span>
+           <button onClick={() => openSummaryModal('Vacation')} className="btn-premium btn-premium-secondary" disabled={reportData.length === 0}>
+             <i className="fa fa-plane text-dark"></i> <span>Vacation List</span>
            </button>
            <button 
              onClick={handleLateArrivals} 
-             className={`btn-premium ${filters.lateOnly ? 'btn-premium-primary' : 'btn-premium-secondary'}`} 
+             className={`btn-premium ${filters.lateOnly ? 'btn-premium-dark' : 'btn-premium-secondary'}`} 
              disabled={reportData.length === 0}
            >
-             <i className="fa fa-clock-o"></i> <span>Late Arrivals (STAFF A)</span>
+             <i className="fa fa-clock-o text-dark"></i> <span>Late Arrivals (STAFF A)</span>
            </button>
            <button onClick={exportToExcel} className="btn-premium btn-premium-secondary" disabled={reportData.length === 0}>
-            <i className="fa fa-file-excel-o"></i> <span>Export Excel</span>
+            <i className="fa fa-file-excel-o text-dark"></i> <span>Excel</span>
           </button>
           <button onClick={exportToPDF} className="btn-premium btn-premium-secondary" disabled={reportData.length === 0}>
-            <i className="fa fa-file-pdf-o"></i> <span>Export PDF</span>
+            <i className="fa fa-file-pdf-o text-dark"></i> <span>PDF</span>
           </button>
         </div>
       </div>
@@ -571,7 +571,7 @@ function AttendanceRegisterAll() {
             />
           </div>
           <div className="col-md-3 d-flex align-items-end gap-2">
-            <button onClick={handleSearch} className="btn-premium btn-premium-primary px-4" disabled={loading}>
+            <button onClick={handleSearch} className="btn-premium btn-premium-dark px-4" disabled={loading}>
               {loading ? <span className="spinner-border spinner-border-sm"></span> : <><i className="fa fa-search"></i> Search</>}
             </button>
             <button onClick={clearFilters} className="btn-premium btn-premium-secondary px-4">
@@ -683,20 +683,25 @@ function AttendanceRegisterAll() {
        </div>
 
        {/* Summary Modal for Absent/Vacation */}
-       <Modal show={showSummaryModal} onHide={() => setShowSummaryModal(false)} size="xl" centered scrollable>
-         <Modal.Header closeButton style={{ backgroundColor: '#0F172A', color: 'white' }}>
-           <Modal.Title className="fw-bold d-flex align-items-center justify-content-between w-100 me-3">
-             <span>
-               {summaryType === 'Absent' ? 'Absent Employees List' : 
-                summaryType === 'Vacation' ? 'Vacation List' : 
-                'Late Arrivals List (STAFF A) - After 08:20 AM'}
-             </span>
-             <span className="badge bg-danger ms-auto" style={{ fontSize: '0.9rem' }}>
-               Total: {getFilteredSummaryData().length}
+       <Modal show={showSummaryModal} onHide={() => setShowSummaryModal(false)} size="xl" centered scrollable className="premium-modal">
+         <Modal.Header closeButton className="border-0 px-4 pt-4 pb-0">
+           <Modal.Title className="fw-bold d-flex align-items-center justify-content-between w-100 me-3 text-dark">
+             <div className="d-flex align-items-center">
+               <div className="icon-box-sm bg-dark text-white me-3 d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px', borderRadius: '8px' }}>
+                 <i className={`fa ${summaryType === 'Late' ? 'fa-clock-o' : summaryType === 'Absent' ? 'fa-user-times' : 'fa-plane'}`}></i>
+               </div>
+               <span>
+                 {summaryType === 'Absent' ? 'Absent Employees List' : 
+                  summaryType === 'Vacation' ? 'Vacation List' : 
+                  'Late Arrivals List (STAFF A)'}
+               </span>
+             </div>
+             <span className="badge bg-dark px-3 py-2" style={{ fontSize: '0.8rem' }}>
+               {getFilteredSummaryData().length} Records
              </span>
            </Modal.Title>
          </Modal.Header>
-         <Modal.Body className="p-0">
+         <Modal.Body className="px-0 py-4">
            <div className="table-responsive">
              <table className="table-premium mb-0">
                <thead>
@@ -722,12 +727,12 @@ function AttendanceRegisterAll() {
                        <td>{row.DATE}</td>
                        <td>{row.TIME || '-'}</td>
                        <td>
-                         <span className={`badge-premium ${row.RAW_DIRECTION === 'IN' ? 'badge-premium-green' : 'badge-premium-red'}`}>
+                         <span className={`badge-premium ${row.RAW_DIRECTION === 'IN' ? 'badge-premium-dark' : 'badge-premium-gray'}`}>
                            {row.RAW_DIRECTION || '-'}
                          </span>
                        </td>
                        <td className="fw-bold">
-                         <span className={`badge-premium ${row.STATUS === 'Present' ? 'badge-premium-green' : row.STATUS === 'Absent' ? 'badge-premium-red' : 'badge-premium-orange'}`}>
+                         <span className={`badge-premium ${row.STATUS === 'Present' ? 'badge-premium-dark' : 'badge-premium-gray'}`}>
                            {row.STATUS}
                          </span>
                        </td>
@@ -735,7 +740,8 @@ function AttendanceRegisterAll() {
                    ))
                  ) : (
                    <tr>
-                     <td colSpan="8" className="text-center py-4 text-muted">
+                     <td colSpan="8" className="text-center py-5 text-muted">
+                       <i className="fa fa-info-circle fa-2x mb-2 d-block opacity-25"></i>
                        No {summaryType.toLowerCase()} records found for the current filter.
                      </td>
                    </tr>
@@ -744,25 +750,30 @@ function AttendanceRegisterAll() {
              </table>
            </div>
          </Modal.Body>
-         <Modal.Footer>
+         <Modal.Footer className="border-0 px-4 pt-0 pb-4">
            <div className="me-auto d-flex gap-2">
-             <Button variant="outline-success" size="sm" onClick={exportSummaryExcel}>
-               <i className="fa fa-file-excel-o"></i> Excel
-             </Button>
-             <Button variant="outline-danger" size="sm" onClick={exportSummaryPDF}>
-               <i className="fa fa-file-pdf-o"></i> PDF
-             </Button>
+             <button className="btn-premium btn-premium-secondary btn-sm" onClick={exportSummaryExcel}>
+               <i className="fa fa-file-excel-o text-dark"></i> Excel
+             </button>
+             <button className="btn-premium btn-premium-secondary btn-sm" onClick={exportSummaryPDF}>
+               <i className="fa fa-file-pdf-o text-dark"></i> PDF
+             </button>
            </div>
-           <Button variant="secondary" onClick={() => setShowSummaryModal(false)}>
+           <button className="btn-premium btn-premium-dark px-4" onClick={() => setShowSummaryModal(false)}>
              Close
-           </Button>
+           </button>
          </Modal.Footer>
        </Modal>
 
        {/* Attendance Summary Modal with Pie Chart */}
-       <Modal show={showAttendanceSummary} onHide={() => setShowAttendanceSummary(false)} size="lg" centered>
-         <Modal.Header closeButton style={{ backgroundColor: '#0F172A', color: 'white' }}>
-           <Modal.Title className="fw-bold">Attendance Summary Report</Modal.Title>
+       <Modal show={showAttendanceSummary} onHide={() => setShowAttendanceSummary(false)} size="lg" centered className="premium-modal">
+         <Modal.Header closeButton className="border-0 px-4 pt-4 pb-0">
+           <Modal.Title className="fw-bold d-flex align-items-center text-dark">
+             <div className="icon-box-sm bg-dark text-white me-3 d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px', borderRadius: '8px' }}>
+               <i className="fa fa-pie-chart"></i>
+             </div>
+             Attendance Summary Report
+           </Modal.Title>
          </Modal.Header>
          <Modal.Body className="p-4">
            <div className="row align-items-center">
@@ -804,9 +815,9 @@ function AttendanceRegisterAll() {
                </div>
              </div>
              <div className="col-md-5">
-               <div className="premium-card bg-white shadow-sm border-0" style={{ borderRadius: '15px' }}>
+               <div className="premium-card bg-white shadow-sm border-0" style={{ borderRadius: '15px', backgroundColor: '#f8fafc' }}>
                  <div className="p-3">
-                   <h5 className="mb-4 fw-bold" style={{ color: '#0F172A' }}>Status Breakdown</h5>
+                   <h5 className="mb-4 fw-bold text-dark">Status Breakdown</h5>
                    <div className="d-flex flex-column gap-3">
                      {getAttendanceChartData().map((item, idx) => {
                        const isClickable = item.name === 'Absent' || item.name === 'Vacation' || item.name === 'On Leave';
@@ -819,10 +830,10 @@ function AttendanceRegisterAll() {
                          >
                            <div className="d-flex align-items-center gap-3">
                              <div style={{ width: 14, height: 14, borderRadius: '4px', backgroundColor: CHART_COLORS[item.name] || CHART_COLORS['Unknown'], boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}></div>
-                             <span className={`fw-semibold ${isClickable ? 'text-primary' : 'text-dark'}`}>{item.name}</span>
+                             <span className={`fw-semibold ${isClickable ? 'text-dark fw-bold' : 'text-muted'}`}>{item.name}</span>
                            </div>
                            <div className="d-flex align-items-center gap-2">
-                             <span className={`badge px-3 py-2 ${isClickable ? 'bg-hover-highlight' : ''}`} style={{ backgroundColor: '#f1f5f9', color: '#0F172A', borderRadius: '8px', fontSize: '0.85rem', transition: 'all 0.2s' }}>
+                             <span className="badge px-3 py-2 bg-dark text-white" style={{ borderRadius: '8px', fontSize: '0.85rem' }}>
                                {item.value}
                              </span>
                            </div>
@@ -830,8 +841,8 @@ function AttendanceRegisterAll() {
                        );
                      })}
                      <div className="d-flex justify-content-between align-items-center pt-3 mt-2">
-                       <span className="fw-bold" style={{ color: '#64748b' }}>Total Records</span>
-                       <span className="badge px-3 py-2" style={{ backgroundColor: '#0F172A', color: 'white', borderRadius: '8px', fontSize: '0.9rem' }}>
+                       <span className="fw-bold text-muted">Total Records</span>
+                       <span className="badge px-3 py-2 bg-dark text-white" style={{ borderRadius: '8px', fontSize: '0.9rem' }}>
                          {allFilteredData.length}
                        </span>
                      </div>
@@ -841,10 +852,10 @@ function AttendanceRegisterAll() {
              </div>
            </div>
          </Modal.Body>
-         <Modal.Footer className="border-0 pb-4 pe-4">
-           <Button variant="secondary" onClick={() => setShowAttendanceSummary(false)} className="px-4 py-2" style={{ borderRadius: '10px', backgroundColor: '#64748b', border: 'none' }}>
+         <Modal.Footer className="border-0 px-4 pt-0 pb-4">
+           <button className="btn-premium btn-premium-dark px-5" onClick={() => setShowAttendanceSummary(false)}>
              Close
-           </Button>
+           </button>
          </Modal.Footer>
        </Modal>
      </div> 

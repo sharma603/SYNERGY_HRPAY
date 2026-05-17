@@ -175,14 +175,32 @@ router.get('/users', auth, admin, async (req, res) => {
   try {
     const pool = await getConnection();
     
-    // Only get users from new Users table
-    const usersNewResult = await pool.request().query(`
-      SELECT username as USR_UserID, name as USR_Name, password as PASSWORD, role, permissions, 'new' as source
-      FROM Users
-      ORDER BY name
+    // Get all employees and link with Users/USER_DEFINITION for emails
+    // This allows Message Broadcast to find all employees and User Roles to manage them
+    const result = await pool.request().query(`
+      SELECT 
+        e.EMP_Code as USR_UserID, 
+        e.EMP_Name as USR_Name, 
+        ISNULL(e.EMP_EMAIL, ISNULL(u.email, ud.USR_EMAIL_ID)) as email,
+        dept.COM_DESC as department,
+        desig.COM_DESC as designation,
+        u.role, 
+        u.permissions, 
+        CASE 
+          WHEN u.username IS NOT NULL THEN 'new' 
+          WHEN ud.USR_UserID IS NOT NULL THEN 'legacy'
+          ELSE 'employee'
+        END as source
+      FROM HRM_EMP_MASTER e
+      LEFT JOIN Users u ON e.EMP_Code = u.username
+      LEFT JOIN USER_DEFINITION ud ON e.EMP_Code = ud.USR_UserID
+      LEFT JOIN COMMONCODES dept ON e.EMP_DEPT_DR = dept.COM_SLNO AND dept.COM_TYPE = 39
+      LEFT JOIN COMMONCODES desig ON e.EMP_DESIG_DR = desig.COM_SLNO AND desig.COM_TYPE = 40
+      WHERE e.emp_stat_flag = 1
+      ORDER BY e.EMP_Name
     `);
 
-    res.json(usersNewResult.recordset);
+    res.json(result.recordset);
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).json({ error: 'Server error fetching user list' });

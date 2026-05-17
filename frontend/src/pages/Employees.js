@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Spinner, Alert, Form, Dropdown, ButtonGroup, Modal, Row, Col, Button } from 'react-bootstrap';
-import { employeeAPI, authAPI } from '../services/api';
+import { Spinner, Alert, Form, Dropdown, ButtonGroup, Modal, Row, Col, Button, Container, Table, InputGroup, Pagination } from 'react-bootstrap';
+import { employeeAPI, authAPI, emailAPI } from '../services/api';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -53,6 +53,7 @@ function Employees() {
   // Modal State
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
+  const [viewOnly, setViewOnly] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [formData, setFormData] = useState({
@@ -87,6 +88,16 @@ function Employees() {
   // Column Customization State
   const [visibleColumns, setVisibleColumns] = useState(DEFAULT_COLUMNS);
 
+  // Email Modal State
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [emailData, setEmailData] = useState({
+    to: '',
+    subject: '',
+    message: '',
+    employeeName: ''
+  });
+
   useEffect(() => {
     fetchEmployees(currentPage, pageSize, searchTerm);
     fetchMasterData();
@@ -98,6 +109,31 @@ function Employees() {
       setMasterData(response.data);
     } catch (err) {
       console.error('Error fetching master data:', err);
+    }
+  };
+
+  const handleOpenEmailModal = (emp) => {
+    setEmailData({
+      to: '', // User will need to enter or we fetch from user mapping
+      subject: 'Message from SYNERGY HRPAY',
+      message: '',
+      employeeName: emp.EMP_Name
+    });
+    setShowEmailModal(true);
+  };
+
+  const handleSendEmail = async (e) => {
+    e.preventDefault();
+    try {
+      setEmailLoading(true);
+      await emailAPI.send(emailData);
+      alert('Email sent successfully!');
+      setShowEmailModal(false);
+    } catch (err) {
+      console.error('Error sending email:', err);
+      alert('Failed to send email. Please ensure SMTP is configured.');
+    } finally {
+      setEmailLoading(false);
     }
   };
 
@@ -120,6 +156,7 @@ function Employees() {
 
   const handleCreateNew = () => {
     setEditMode(false);
+    setViewOnly(false);
     setSelectedFile(null);
     setImagePreview(null);
     setFormData({
@@ -165,6 +202,7 @@ function Employees() {
 
   const handleEdit = (emp) => {
     setEditMode(true);
+    setViewOnly(false);
     setSelectedFile(null);
     setImagePreview(emp.EMP_IMAGE ? `data:image/jpeg;base64,${emp.EMP_IMAGE}` : null);
     // Map backend date strings to YYYY-MM-DD for input[type="date"]
@@ -178,6 +216,41 @@ function Employees() {
       EMP_Name: emp.EMP_Name || '',
       EMP_LOC_DR: emp.EMP_LOC_DR_ID || '', // We need the ID here
       EMP_DEPT_DR: emp.EMP_DEPT_DR_ID || '', 
+      EMP_DESIG_DR: emp.EMP_DESIG_DR_ID || '',
+      EMP_DOB: formatDateForInput(emp.EMP_DOB),
+      EMP_NATION_DR: emp.EMP_NATION_DR_ID || '',
+      EMP_RELIGION_DR: emp.EMP_RELIGION_DR_ID || '',
+      EMP_PREV_ID: emp.EMP_PREV_ID || '',
+      EMP_JOIN_DATE: formatDateForInput(emp.EMP_JOIN_DATE),
+      EMP_ADDRESS: emp.EMP_ADDRESS || '',
+      EMP_LAB_NO: emp.EMP_LAB_NO || '',
+      EMP_MOL_NO: emp.EMP_MOL_NO || '',
+      EMP_OT_DR: emp.EMP_OT_DR || '',
+      EMP_BANK_DR: emp.EMP_BANK_DR_ID || '',
+      EMP_BRANCH: emp.EMP_BRANCH || '',
+      EMP_AC_NO: emp.EMP_AC_NO || '',
+      EMP_SWIFT_CODE: emp.EMP_SWIFT_CODE || '',
+      EMP_UNIQ_CODE: emp.EMP_UNIQ_CODE || '',
+      EMP_Slno: emp.EMP_Slno
+    });
+    setShowModal(true);
+  };
+
+  const handleView = (emp) => {
+    setEditMode(false);
+    setViewOnly(true);
+    setSelectedFile(null);
+    setImagePreview(emp.EMP_IMAGE ? `data:image/jpeg;base64,${emp.EMP_IMAGE}` : null);
+    const formatDateForInput = (dateStr) => {
+      if (!dateStr) return '';
+      return new Date(dateStr).toISOString().split('T')[0];
+    };
+
+    setFormData({
+      EMP_Code: emp.EMP_Code || '',
+      EMP_Name: emp.EMP_Name || '',
+      EMP_LOC_DR: emp.EMP_LOC_DR_ID || '',
+      EMP_DEPT_DR: emp.EMP_DEPT_DR_ID || '',
       EMP_DESIG_DR: emp.EMP_DESIG_DR_ID || '',
       EMP_DOB: formatDateForInput(emp.EMP_DOB),
       EMP_NATION_DR: emp.EMP_NATION_DR_ID || '',
@@ -357,9 +430,7 @@ function Employees() {
           <h1 className="premium-title">Employee Management</h1>
         </div>
         <div className="d-flex gap-3 align-items-center flex-wrap">
-          <button className="btn-premium btn-premium-primary" onClick={handleCreateNew}>
-            <i className="fa fa-user-plus me-1"></i> Add Employee
-          </button>
+          {/* Add Employee Button Removed as per request */}
           
           <form onSubmit={handleSearch} className="search-container-premium">
             <i className="fa fa-search search-icon-premium"></i>
@@ -469,11 +540,11 @@ function Employees() {
                               ? formatDate(emp[col.key])
                               : col.key === 'ACTIONS' ? (
                                 <div className="d-flex gap-2">
-                                  <button className="btn-premium btn-premium-secondary btn-sm p-2" onClick={() => handleEdit(emp)} title="Edit">
-                                    <i className="fa fa-edit m-0"></i>
+                                  <button className="btn-premium btn-premium-primary btn-sm p-2" onClick={() => handleOpenEmailModal(emp)} title="Send Message">
+                                    <i className="fa fa-envelope m-0"></i>
                                   </button>
-                                  <button className="btn-premium btn-premium-red btn-sm p-2" onClick={() => handleDelete(emp.EMP_Slno)} title="Delete">
-                                    <i className="fa fa-trash m-0"></i>
+                                  <button className="btn-premium btn-premium-secondary btn-sm p-2" onClick={() => handleView(emp)} title="View Details">
+                                    <i className="fa fa-eye m-0"></i>
                                   </button>
                                 </div>
                               ) : emp[col.key] || '-'}
@@ -557,9 +628,9 @@ function Employees() {
         <Modal.Header closeButton className="border-0 px-4 pt-4 pb-0">
           <Modal.Title className="fw-bold d-flex align-items-center">
             <div className="icon-box-sm me-3">
-              <i className={`fa ${editMode ? 'fa-user-edit' : 'fa-user-plus'}`}></i>
+              <i className={`fa ${viewOnly ? 'fa-eye' : (editMode ? 'fa-user-edit' : 'fa-user-plus')}`}></i>
             </div>
-            {editMode ? 'Edit Employee Details' : 'Add New Employee'}
+            {viewOnly ? 'View Employee Details' : (editMode ? 'Edit Employee Details' : 'Add New Employee')}
           </Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleSubmit}>
@@ -601,6 +672,7 @@ function Employees() {
                       type="text" name="EMP_Code" className="form-control"
                       value={formData.EMP_Code} onChange={handleInputChange}
                       placeholder="e.g. EMP001" required
+                      disabled={viewOnly}
                     />
                   </Form.Group>
                 </Col>
@@ -611,6 +683,7 @@ function Employees() {
                       type="text" name="EMP_Name" className="form-control"
                       value={formData.EMP_Name} onChange={handleInputChange}
                       placeholder="Enter full name" required
+                      disabled={viewOnly}
                     />
                   </Form.Group>
                 </Col>
@@ -621,6 +694,7 @@ function Employees() {
                       type="text" name="EMP_PREV_ID" className="form-control"
                       value={formData.EMP_PREV_ID} onChange={handleInputChange}
                       placeholder="Optional"
+                      disabled={viewOnly}
                     />
                   </Form.Group>
                 </Col>
@@ -638,6 +712,7 @@ function Employees() {
                     <Form.Select
                       name="EMP_DEPT_DR" className="form-select"
                       value={formData.EMP_DEPT_DR} onChange={handleInputChange}
+                      disabled={viewOnly}
                     >
                       <option value="">Select Department</option>
                       {masterData.departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
@@ -650,6 +725,7 @@ function Employees() {
                     <Form.Select
                       name="EMP_DESIG_DR" className="form-select"
                       value={formData.EMP_DESIG_DR} onChange={handleInputChange}
+                      disabled={viewOnly}
                     >
                       <option value="">Select Designation</option>
                       {masterData.designations.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
@@ -662,6 +738,7 @@ function Employees() {
                     <Form.Select
                       name="EMP_LOC_DR" className="form-select"
                       value={formData.EMP_LOC_DR} onChange={handleInputChange}
+                      disabled={viewOnly}
                     >
                       <option value="">Select Location</option>
                       {masterData.locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
@@ -674,6 +751,7 @@ function Employees() {
                     <Form.Control
                       type="date" name="EMP_JOIN_DATE" className="form-control"
                       value={formData.EMP_JOIN_DATE} onChange={handleInputChange}
+                      disabled={viewOnly}
                     />
                   </Form.Group>
                 </Col>
@@ -683,6 +761,7 @@ function Employees() {
                     <Form.Select
                       name="EMP_OT_DR" className="form-select"
                       value={formData.EMP_OT_DR} onChange={handleInputChange}
+                      disabled={viewOnly}
                     >
                       <option value="">Select OT Rule</option>
                       {/* Assuming OT rules are in master data or static */}
@@ -697,6 +776,7 @@ function Employees() {
                     <Form.Control
                       type="text" name="EMP_UNIQ_CODE" className="form-control"
                       value={formData.EMP_UNIQ_CODE} onChange={handleInputChange}
+                      disabled={viewOnly}
                     />
                   </Form.Group>
                 </Col>
@@ -714,6 +794,7 @@ function Employees() {
                     <Form.Control
                       type="date" name="EMP_DOB" className="form-control"
                       value={formData.EMP_DOB} onChange={handleInputChange}
+                      disabled={viewOnly}
                     />
                   </Form.Group>
                 </Col>
@@ -723,6 +804,7 @@ function Employees() {
                     <Form.Select
                       name="EMP_NATION_DR" className="form-select"
                       value={formData.EMP_NATION_DR} onChange={handleInputChange}
+                      disabled={viewOnly}
                     >
                       <option value="">Select Nationality</option>
                       {/* Using the master data logic if available, otherwise simplified */}
@@ -738,6 +820,7 @@ function Employees() {
                     <Form.Select
                       name="EMP_RELIGION_DR" className="form-select"
                       value={formData.EMP_RELIGION_DR} onChange={handleInputChange}
+                      disabled={viewOnly}
                     >
                       <option value="">Select Religion</option>
                       <option value="1">Islam</option>
@@ -753,6 +836,7 @@ function Employees() {
                       as="textarea" rows={1} name="EMP_ADDRESS" className="form-control"
                       value={formData.EMP_ADDRESS} onChange={handleInputChange}
                       placeholder="Full residential address"
+                      disabled={viewOnly}
                     />
                   </Form.Group>
                 </Col>
@@ -764,11 +848,13 @@ function Employees() {
                         type="text" name="EMP_LAB_NO" className="form-control"
                         value={formData.EMP_LAB_NO} onChange={handleInputChange}
                         placeholder="Lab"
+                        disabled={viewOnly}
                       />
                       <Form.Control
                         type="text" name="EMP_MOL_NO" className="form-control"
                         value={formData.EMP_MOL_NO} onChange={handleInputChange}
                         placeholder="MOL"
+                        disabled={viewOnly}
                       />
                     </div>
                   </Form.Group>
@@ -779,6 +865,7 @@ function Employees() {
                     <Form.Select
                       name="EMP_BANK_DR" className="form-select"
                       value={formData.EMP_BANK_DR} onChange={handleInputChange}
+                      disabled={viewOnly}
                     >
                       <option value="">Select Bank</option>
                       <option value="1">Al Rajhi Bank</option>
@@ -795,11 +882,13 @@ function Employees() {
                         type="text" name="EMP_BRANCH" className="form-control"
                         value={formData.EMP_BRANCH} onChange={handleInputChange}
                         placeholder="Branch"
+                        disabled={viewOnly}
                       />
                       <Form.Control
                         type="text" name="EMP_SWIFT_CODE" className="form-control"
                         value={formData.EMP_SWIFT_CODE} onChange={handleInputChange}
                         placeholder="Swift"
+                        disabled={viewOnly}
                       />
                     </div>
                   </Form.Group>
@@ -811,6 +900,7 @@ function Employees() {
                       type="text" name="EMP_AC_NO" className="form-control"
                       value={formData.EMP_AC_NO} onChange={handleInputChange}
                       placeholder="IBAN or A/C No"
+                      disabled={viewOnly}
                     />
                   </Form.Group>
                 </Col>
@@ -819,10 +909,78 @@ function Employees() {
           </Modal.Body>
           <Modal.Footer className="border-0 px-4 pt-0 pb-4 d-flex justify-content-end gap-2">
             <button type="button" className="btn-premium btn-premium-secondary px-4" onClick={() => setShowModal(false)}>
+              {viewOnly ? 'Close' : 'Cancel'}
+            </button>
+            {!viewOnly && (
+              <button type="submit" className="btn-premium btn-premium-primary px-5">
+                {editMode ? 'Save Changes' : 'Register Employee'}
+              </button>
+            )}
+          </Modal.Footer>
+        </Form>
+      </Modal>
+
+      {/* Send Email Modal */}
+      <Modal show={showEmailModal} onHide={() => setShowEmailModal(false)} size="lg" centered className="premium-modal">
+        <Form onSubmit={handleSendEmail}>
+          <Modal.Header closeButton className="border-0 px-4 pt-4">
+            <Modal.Title className="fw-bold text-dark d-flex align-items-center">
+              <div className="icon-box-sm bg-dark text-white me-3">
+                <i className="fa fa-paper-plane"></i>
+              </div>
+              Send Message to {emailData.employeeName}
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="px-4 py-3">
+            <Row className="g-3">
+              <Col md={12}>
+                <Form.Group>
+                  <Form.Label className="small fw-bold text-muted text-uppercase">Recipient Email</Form.Label>
+                  <Form.Control
+                    type="email"
+                    required
+                    placeholder="employee@example.com"
+                    value={emailData.to}
+                    onChange={(e) => setEmailData({ ...emailData, to: e.target.value })}
+                    className="form-control shadow-none"
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={12}>
+                <Form.Group>
+                  <Form.Label className="small fw-bold text-muted text-uppercase">Subject</Form.Label>
+                  <Form.Control
+                    type="text"
+                    required
+                    value={emailData.subject}
+                    onChange={(e) => setEmailData({ ...emailData, subject: e.target.value })}
+                    className="form-control shadow-none"
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={12}>
+                <Form.Group>
+                  <Form.Label className="small fw-bold text-muted text-uppercase">Message Content</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={6}
+                    required
+                    placeholder="Write your message here..."
+                    value={emailData.message}
+                    onChange={(e) => setEmailData({ ...emailData, message: e.target.value })}
+                    className="form-control shadow-none"
+                    style={{ resize: 'none' }}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+          </Modal.Body>
+          <Modal.Footer className="border-0 px-4 pt-0 pb-4 d-flex justify-content-end gap-2">
+            <button type="button" className="btn-premium btn-premium-secondary px-4" onClick={() => setShowEmailModal(false)}>
               Cancel
             </button>
-            <button type="submit" className="btn-premium btn-premium-primary px-5">
-              {editMode ? 'Save Changes' : 'Register Employee'}
+            <button type="submit" disabled={emailLoading} className="btn-premium btn-premium-primary px-5 bg-dark border-dark">
+              {emailLoading ? <><Spinner size="sm" className="me-2" /> Sending...</> : <><i className="fa fa-send me-2"></i> Send Email</>}
             </button>
           </Modal.Footer>
         </Form>

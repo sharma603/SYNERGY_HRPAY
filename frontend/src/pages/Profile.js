@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { authAPI } from '../services/api';
 import '../PremiumTheme.css';
 import './CostAllocationMonth.css'; // Reusing some styles
-
+// this
 function Profile() {
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);

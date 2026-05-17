@@ -59,17 +59,18 @@ const getDashboardStats = async (req, res) => {
     });
 
     // Get recent activities (Latest 5 leave requests)
-    // Using fields confirmed in leaveController.js and SynAnnualLeaveExitPermit
     let activities = [];
     try {
       const recentLeaves = await pool.request().query(`
         SELECT TOP 5 
           e.EMP_Name as empName,
           'leave' as type,
-          e.EMP_Name + ' requested ' + l.ALTR_TYPE + ' from ' + CONVERT(VARCHAR, l.ALTR_FROM_DT, 106) as message,
+          e.EMP_Name + ' (' + ISNULL(u.email, ISNULL(ud.USR_EMAIL_ID, 'No Email')) + ') requested ' + l.ALTR_TYPE + ' from ' + CONVERT(VARCHAR, l.ALTR_FROM_DT, 106) as message,
           l.ALTR_FROM_DT as timestamp
         FROM HRM_ANUAL_LEAVE_TRN l
         JOIN HRM_EMP_MASTER e ON l.ALTR_EMP_MASTER_PR = e.EMP_Slno
+        LEFT JOIN Users u ON e.EMP_Code = u.username
+        LEFT JOIN USER_DEFINITION ud ON e.EMP_Code = ud.USR_UserID
         ORDER BY l.ALTR_SLNO DESC
       `);
       activities = recentLeaves.recordset || [];

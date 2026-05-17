@@ -22,6 +22,7 @@ function Navigation({ onToggleSidebar, user }) {
     { title: 'Employee Site Location', path: '/reports/employee-site-location', category: 'Reports', icon: 'fa-map-marker' },
     { title: 'User Roles', path: '/user-roles', category: 'Management', icon: 'fa-shield' },
     { title: 'Employees', path: '/employees', category: 'Management', icon: 'fa-users' },
+    { title: 'Message Broadcast', path: '/message-broadcast', category: 'Management', icon: 'fa-bullhorn' },
     { title: 'My Profile', path: '/profile', category: 'User', icon: 'fa-user-o' },
     { title: 'Settings', path: '/settings', category: 'User', icon: 'fa-cog' }
   ];

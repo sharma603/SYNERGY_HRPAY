@@ -4,9 +4,9 @@ import { authAPI } from '../services/api';
 import '../PremiumTheme.css';
 // this
 const ROLES = [
-  { id: 'admin', label: 'Administrator', color: 'danger', permissions: ['all'] },
-  { id: 'manager', label: 'Manager', color: 'primary', permissions: ['dashboard', 'employees', 'report-cost-allocation', 'report-attendance-register'] },
-  { id: 'user', label: 'Standard User', color: 'info', permissions: ['dashboard'] }
+  { id: 'admin', label: 'Administrator', color: 'dark', permissions: ['all'] },
+  { id: 'manager', label: 'Manager', color: 'gray', permissions: ['dashboard', 'employees', 'report-cost-allocation', 'report-attendance-register'] },
+  { id: 'user', label: 'Standard User', color: 'gray', permissions: ['dashboard'] }
 ];
 
 const PAGES = [
@@ -19,6 +19,7 @@ const PAGES = [
   { id: 'report-attendance-register-all', label: 'Report: Attendance Register All', icon: 'fa-clock-o' },
   { id: 'report-employee-site-location', label: 'Report: Employee Site Location', icon: 'fa-map-marker' },
   { id: 'user-roles', label: 'User Roles', icon: 'fa-shield' },
+  { id: 'message-broadcast', label: 'Message Broadcast', icon: 'fa-bullhorn' },
   { id: 'settings', label: 'Settings', icon: 'fa-cog' }
 ];
 
@@ -167,7 +168,7 @@ function UserRoles() {
           <h1 className="premium-title">User Roles & Permissions</h1>
           <p className="premium-subtitle">Manage system users, assigned roles, and granular page-level access permissions</p>
         </div>
-        <button className="btn-premium btn-premium-primary" onClick={handleCreateNew}>
+        <button className="btn-premium btn-premium-dark" onClick={handleCreateNew}>
           <i className="fa fa-user-plus"></i> <span>Create New User</span>
         </button>
       </div>
@@ -219,28 +220,28 @@ function UserRoles() {
                         </span>
                       </td>
                       <td>
-                        <span className={`badge-premium ${user.source === 'new' ? 'badge-premium-blue' : 'badge-premium-gray'}`}>
+                        <span className={`badge-premium ${user.source === 'new' ? 'badge-premium-dark' : 'badge-premium-gray'}`}>
                           {user.source || 'Legacy'}
                         </span>
                       </td>
                       <td>
-                        <span className="badge-premium badge-premium-gray">
+                        <span className="badge-premium badge-premium-dark">
                           <i className="fa fa-lock me-1"></i> {permissionsCount} Modules
                         </span>
                       </td>
                       <td>
                         <div className="d-flex gap-2 justify-content-end">
                           <button className="btn-premium btn-premium-secondary btn-sm p-2" onClick={() => handleView(user)} title="View Details">
-                            <i className="fa fa-eye m-0"></i>
+                            <i className="fa fa-eye m-0 text-dark"></i>
                           </button>
                           {user.source === 'new' && (
                             <button className="btn-premium btn-premium-secondary btn-sm p-2" onClick={() => handleEdit(user)} title="Edit User">
-                              <i className="fa fa-edit m-0"></i>
+                              <i className="fa fa-edit m-0 text-dark"></i>
                             </button>
                           )}
                           {user.source === 'new' && user.USR_UserID !== 'admin' && (
-                            <button className="btn-premium btn-premium-red btn-sm p-2" onClick={() => handleDelete(user.USR_UserID)} title="Delete User">
-                              <i className="fa fa-trash m-0"></i>
+                            <button className="btn-premium btn-premium-secondary btn-sm p-2" onClick={() => handleDelete(user.USR_UserID)} title="Delete User">
+                              <i className="fa fa-trash m-0 text-danger"></i>
                             </button>
                           )}
                         </div>
@@ -263,8 +264,8 @@ function UserRoles() {
 
       <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg" className="premium-modal">
         <Modal.Header closeButton className="border-0 px-4 pt-4 pb-0">
-          <Modal.Title className="fw-bold d-flex align-items-center">
-            <div className="icon-box-sm me-3">
+          <Modal.Title className="fw-bold d-flex align-items-center text-dark">
+            <div className="icon-box-sm bg-dark text-white me-3 d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px', borderRadius: '8px' }}>
               <i className={`fa ${viewOnly ? 'fa-user-circle-o' : editMode ? 'fa-user-edit' : 'fa-user-plus'}`}></i>
             </div>
             {viewOnly ? 'User Details' : editMode ? 'Edit User Account' : 'Create New User Account'}
@@ -277,7 +278,7 @@ function UserRoles() {
                 <Form.Group>
                   <Form.Label className="form-label fw-bold small text-muted text-uppercase">Employee Name</Form.Label>
                   <Form.Select 
-                    name="name" className="form-select" 
+                    name="name" className="form-select border-gray-200" 
                     value={formData.name} onChange={handleInputChange} 
                     required disabled={viewOnly || editMode}
                   >
@@ -294,7 +295,7 @@ function UserRoles() {
                 <Form.Group>
                   <Form.Label className="form-label fw-bold small text-muted text-uppercase">Login Username</Form.Label>
                   <Form.Control 
-                    type="text" name="username" className="form-control" 
+                    type="text" name="username" className="form-control border-gray-200" 
                     value={formData.username} onChange={handleInputChange} 
                     placeholder="e.g. jdoe"
                     required disabled={viewOnly || editMode}
@@ -308,7 +309,7 @@ function UserRoles() {
                       {editMode ? 'Reset Password' : 'Password'}
                     </Form.Label>
                     <Form.Control 
-                      type="password" name="password" className="form-control" 
+                      type="password" name="password" className="form-control border-gray-200" 
                       value={formData.password} onChange={handleInputChange} 
                       placeholder={editMode ? "Leave blank to keep current" : "Enter secure password"}
                       required={!editMode}
@@ -320,7 +321,7 @@ function UserRoles() {
                 <Form.Group>
                   <Form.Label className="form-label fw-bold small text-muted text-uppercase">Email Address</Form.Label>
                   <Form.Control 
-                    type="email" name="email" className="form-control" 
+                    type="email" name="email" className="form-control border-gray-200" 
                     value={formData.email} onChange={handleInputChange} 
                     placeholder="e.g. john@example.com"
                     disabled={viewOnly}
@@ -331,7 +332,7 @@ function UserRoles() {
                 <Form.Group>
                   <Form.Label className="form-label fw-bold small text-muted text-uppercase">Phone Number</Form.Label>
                   <Form.Control 
-                    type="text" name="phone" className="form-control" 
+                    type="text" name="phone" className="form-control border-gray-200" 
                     value={formData.phone} onChange={handleInputChange} 
                     placeholder="e.g. +1234567890"
                     disabled={viewOnly}
@@ -342,7 +343,7 @@ function UserRoles() {
                 <Form.Group>
                   <Form.Label className="form-label fw-bold small text-muted text-uppercase">System Role</Form.Label>
                   <Form.Select 
-                    name="role" className="form-select" 
+                    name="role" className="form-select border-gray-200" 
                     value={formData.role} onChange={handleInputChange}
                     disabled={viewOnly}
                   >
@@ -354,7 +355,7 @@ function UserRoles() {
                 <Form.Group>
                   <Form.Label className="form-label fw-bold small text-muted text-uppercase">Primary Department</Form.Label>
                   <Form.Select 
-                    name="department" className="form-select" 
+                    name="department" className="form-select border-gray-200" 
                     value={formData.department} onChange={handleInputChange}
                     disabled={viewOnly}
                   >
@@ -367,7 +368,7 @@ function UserRoles() {
                 <Form.Group>
                   <Form.Label className="form-label fw-bold small text-muted text-uppercase">Job Designation</Form.Label>
                   <Form.Select 
-                    name="designation" className="form-select" 
+                    name="designation" className="form-select border-gray-200" 
                     value={formData.designation} onChange={handleInputChange}
                     disabled={viewOnly}
                   >
@@ -379,20 +380,20 @@ function UserRoles() {
               
               <Col md={12}>
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h6 className="fw-bold m-0 d-flex align-items-center text-uppercase small text-primary">
+                  <h6 className="fw-bold m-0 d-flex align-items-center text-uppercase small text-dark">
                     <i className="fa fa-shield me-2"></i> Page Access Permissions
                   </h6>
                   {!viewOnly && (
                     <div className="d-flex gap-2">
                       <button 
-                        type="button" className="btn btn-link btn-sm p-0 text-decoration-none small"
+                        type="button" className="btn btn-link btn-sm p-0 text-decoration-none small text-dark fw-bold"
                         onClick={() => setFormData(prev => ({ ...prev, permissions: PAGES.map(p => p.id) }))}
                       >
                         Select All
                       </button>
                       <span className="text-muted small">|</span>
                       <button 
-                        type="button" className="btn btn-link btn-sm p-0 text-decoration-none small"
+                        type="button" className="btn btn-link btn-sm p-0 text-decoration-none small text-muted fw-bold"
                         onClick={() => setFormData(prev => ({ ...prev, permissions: [] }))}
                       >
                         Clear All
@@ -400,17 +401,17 @@ function UserRoles() {
                     </div>
                   )}
                 </div>
-                <div className="premium-card bg-light p-3 border-0">
+                <div className="premium-card bg-light p-3 border-0 shadow-none" style={{ backgroundColor: '#f8fafc' }}>
                   <div className="row g-3">
                     {PAGES.map(page => (
                       <Col key={page.id} sm={6} lg={4}>
-                        <div className={`permission-card-item p-2 rounded ${formData.permissions.includes(page.id) ? 'active' : ''}`}>
+                        <div className={`permission-card-item p-2 rounded border transition-all ${formData.permissions.includes(page.id) ? 'bg-dark text-white border-dark' : 'bg-white text-dark border-gray-100'}`}>
                           <Form.Check 
                             type="checkbox"
                             id={`perm-${page.id}`}
                             label={
                               <div className="d-flex align-items-center ms-1">
-                                <div className="permission-icon-box me-2">
+                                <div className={`permission-icon-box me-2 d-flex align-items-center justify-content-center ${formData.permissions.includes(page.id) ? 'text-white' : 'text-muted'}`} style={{ width: '24px' }}>
                                   <i className={`fa ${page.icon}`}></i>
                                 </div>
                                 <span className="small fw-semibold">{page.label}</span>
@@ -419,7 +420,7 @@ function UserRoles() {
                             checked={formData.permissions.includes(page.id)}
                             onChange={() => handlePermissionChange(page.id)}
                             disabled={viewOnly}
-                            className="m-0"
+                            className="m-0 custom-checkbox-white"
                           />
                         </div>
                       </Col>
@@ -430,11 +431,11 @@ function UserRoles() {
             </Row>
           </Modal.Body>
           <Modal.Footer className="border-0 px-4 pt-0 pb-4 d-flex justify-content-end gap-2">
-            <button type="button" className="btn-premium btn-premium-secondary px-4" onClick={() => setShowModal(false)}>
+            <button type="button" className="btn-premium btn-premium-secondary px-4 fw-bold" onClick={() => setShowModal(false)}>
               Cancel
             </button>
             {!viewOnly && (
-              <button type="submit" className="btn-premium btn-premium-primary px-5">
+              <button type="submit" className="btn-premium btn-premium-dark px-5 fw-bold">
                 {editMode ? 'Save Changes' : 'Create Account'}
               </button>
             )}
