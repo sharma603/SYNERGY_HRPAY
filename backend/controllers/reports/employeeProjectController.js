@@ -11,6 +11,8 @@ const getEmployeeProjectReport = async (req, res) => {
       designation,
       section,
       project,
+      empCode,
+      nationality,
       page = 1,
       limit = 10
     } = params;
@@ -25,7 +27,22 @@ const getEmployeeProjectReport = async (req, res) => {
 
     const result = await request.execute('synEmployeeProjectReport');
     
-    const allRecords = result.recordset || [];
+    let allRecords = result.recordset || [];
+
+    // Apply additional filters if provided
+    if (empCode) {
+      const codes = empCode.split(',').map(c => c.trim().toUpperCase());
+      allRecords = allRecords.filter(row => 
+        row.EMP_CODE && codes.includes(row.EMP_CODE.trim().toUpperCase())
+      );
+    }
+
+    if (nationality) {
+      allRecords = allRecords.filter(row => 
+        row.Nationality && row.Nationality.trim().toUpperCase() === nationality.trim().toUpperCase()
+      );
+    }
+
     const totalRecords = allRecords.length;
 
     const offset = (parseInt(page) - 1) * parseInt(limit);

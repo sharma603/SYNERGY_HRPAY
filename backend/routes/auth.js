@@ -396,6 +396,13 @@ router.get('/master-data', auth, async (req, res) => {
       ORDER BY COM_NAME
     `);
 
+    const nationalities = await safeQuery(`
+      SELECT COM_SLNO as id, COM_DESC as name 
+      FROM COMMONCODES 
+      WHERE COM_TYPE = 41
+      ORDER BY COM_DESC
+    `);
+
     const projects = await safeQuery(`
       SELECT DISTINCT c.COM_SLNO as id, c.COM_DESC as name 
       FROM COMMONCODES c
@@ -428,6 +435,7 @@ router.get('/master-data', auth, async (req, res) => {
       sections,
       companies,
       projects,
+      nationalities,
       attendanceStatuses
     });
   } catch (error) {

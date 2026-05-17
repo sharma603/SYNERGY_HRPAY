@@ -207,11 +207,11 @@ function AttendanceRegisterAll() {
   };
 
    const CHART_COLORS = {
-    'Present': '#1a1a1a', // Black
-    'Absent': '#666666',  // Gray
-    'Vacation': '#333333', // Dark Gray
-    'On Leave': '#444444', // Medium Gray
-    'Holiday': '#888888',  // Light Gray
+    'Present': '#10b981', // Emerald
+    'Absent': '#f43f5e',  // Rose
+    'Vacation': '#3b82f6', // Blue
+    'On Leave': '#8b5cf6', // Violet
+    'Holiday': '#f59e0b',  // Amber
     'Unknown': '#94a3b8'   // Slate
   };
 
@@ -727,12 +727,12 @@ function AttendanceRegisterAll() {
                        <td>{row.DATE}</td>
                        <td>{row.TIME || '-'}</td>
                        <td>
-                         <span className={`badge-premium ${row.RAW_DIRECTION === 'IN' ? 'badge-premium-dark' : 'badge-premium-gray'}`}>
+                         <span className={`badge-premium ${row.RAW_DIRECTION === 'IN' ? 'badge-premium-green' : 'badge-premium-red'}`}>
                            {row.RAW_DIRECTION || '-'}
                          </span>
                        </td>
                        <td className="fw-bold">
-                         <span className={`badge-premium ${row.STATUS === 'Present' ? 'badge-premium-dark' : 'badge-premium-gray'}`}>
+                         <span className={`badge-premium ${row.STATUS === 'Present' ? 'badge-premium-green' : row.STATUS === 'Absent' ? 'badge-premium-red' : 'badge-premium-blue'}`}>
                            {row.STATUS}
                          </span>
                        </td>

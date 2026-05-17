@@ -21,20 +21,33 @@ function EmployeeSiteLocation() {
     department: '',
     designation: '',
     section: '',
-    project: ''
+    project: '',
+    empCode: '',
+    nationality: ''
   });
 
   const [masterData, setMasterData] = useState({
     departments: [],
     designations: [],
     sections: [],
-    projects: []
+    projects: [],
+    employees: [],
+    nationalities: []
   });
 
   const fetchMasterData = async () => {
     try {
       const response = await authAPI.getMasterData();
-      setMasterData(response.data);
+      const data = response.data;
+      setMasterData(prev => ({
+        ...prev,
+        departments: data.departments || [],
+        designations: data.designations || [],
+        sections: data.sections || [],
+        projects: data.projects || [],
+        employees: data.employees || [],
+        nationalities: data.nationalities || []
+      }));
     } catch (err) {
       console.error('Error fetching master data:', err);
     }
@@ -107,7 +120,9 @@ function EmployeeSiteLocation() {
   };
 
   const handleSelectChange = (selectedOption, { name }) => {
-    const value = selectedOption ? selectedOption.value : '';
+    const value = name === 'empCode' 
+      ? (selectedOption ? selectedOption.map(opt => opt.value).join(',') : '')
+      : (selectedOption ? selectedOption.value : '');
     setFilters(prev => ({ ...prev, [name]: value }));
   };
 
@@ -116,7 +131,9 @@ function EmployeeSiteLocation() {
       department: '',
       designation: '',
       section: '',
-      project: ''
+      project: '',
+      empCode: '',
+      nationality: ''
     });
   };
 
@@ -301,9 +318,9 @@ function EmployeeSiteLocation() {
             <label className="form-label fw-bold small text-muted text-uppercase">Department</label>
             <Select
               name="department"
-              value={masterData.departments.find(d => d.name === filters.department) ? { value: filters.department, label: filters.department } : null}
+              value={masterData.departments?.find(d => d.name === filters.department) ? { value: filters.department, label: filters.department } : null}
               onChange={handleSelectChange}
-              options={masterData.departments.map(d => ({ value: d.name, label: d.name }))}
+              options={masterData.departments?.map(d => ({ value: d.name, label: d.name })) || []}
               placeholder="All Departments"
               styles={customSelectStyles}
               isClearable
@@ -313,9 +330,9 @@ function EmployeeSiteLocation() {
             <label className="form-label fw-bold small text-muted text-uppercase">Designation</label>
             <Select
               name="designation"
-              value={masterData.designations.find(d => d.name === filters.designation) ? { value: filters.designation, label: filters.designation } : null}
+              value={masterData.designations?.find(d => d.name === filters.designation) ? { value: filters.designation, label: filters.designation } : null}
               onChange={handleSelectChange}
-              options={masterData.designations.map(d => ({ value: d.name, label: d.name }))}
+              options={masterData.designations?.map(d => ({ value: d.name, label: d.name })) || []}
               placeholder="All Designations"
               styles={customSelectStyles}
               isClearable
@@ -325,9 +342,9 @@ function EmployeeSiteLocation() {
             <label className="form-label fw-bold small text-muted text-uppercase">Section</label>
             <Select
               name="section"
-              value={masterData.sections.find(s => s.name === filters.section) ? { value: filters.section, label: filters.section } : null}
+              value={masterData.sections?.find(s => s.name === filters.section) ? { value: filters.section, label: filters.section } : null}
               onChange={handleSelectChange}
-              options={masterData.sections.map(s => ({ value: s.name, label: s.name }))}
+              options={masterData.sections?.map(s => ({ value: s.name, label: s.name })) || []}
               placeholder="All Sections"
               styles={customSelectStyles}
               isClearable
@@ -337,20 +354,48 @@ function EmployeeSiteLocation() {
             <label className="form-label fw-bold small text-muted text-uppercase">Site / Project</label>
             <Select
               name="project"
-              value={masterData.projects.find(p => p.name === filters.project) ? { value: filters.project, label: filters.project } : null}
+              value={masterData.projects?.find(p => p.name === filters.project) ? { value: filters.project, label: filters.project } : null}
               onChange={handleSelectChange}
-              options={masterData.projects.map(p => ({ value: p.name, label: p.name }))}
+              options={masterData.projects?.map(p => ({ value: p.name, label: p.name })) || []}
               placeholder="All Projects"
               styles={customSelectStyles}
               isClearable
             />
           </div>
-          <div className="col-md-8 d-flex justify-content-end gap-2 mt-3">
+          <div className="col-md-4">
+            <label className="form-label fw-bold small text-muted text-uppercase">Nationality</label>
+            <Select
+              name="nationality"
+              value={masterData.nationalities?.find(n => n.name === filters.nationality) ? { value: filters.nationality, label: filters.nationality } : null}
+              onChange={handleSelectChange}
+              options={masterData.nationalities?.map(n => ({ value: n.name, label: n.name })) || []}
+              placeholder="All Nationalities"
+              styles={customSelectStyles}
+              isClearable
+            />
+          </div>
+          <div className="col-md-4">
+            <label className="form-label fw-bold small text-muted text-uppercase">Employee Code</label>
+            <Select
+              isMulti
+              name="empCode"
+              value={filters.empCode ? filters.empCode.split(',').map(val => {
+                const emp = masterData.employees?.find(e => e.code === val);
+                return emp ? { value: emp.code, label: `${emp.name} (${emp.code})` } : null;
+              }).filter(Boolean) : []}
+              onChange={(opt) => handleSelectChange(opt, { name: 'empCode' })}
+              options={masterData.employees?.map(e => ({ value: e.code, label: `${e.name} (${e.code})` })) || []}
+              placeholder="Select Employees..."
+              styles={customSelectStyles}
+              isClearable
+            />
+          </div>
+          <div className="col-md-4 d-flex align-items-end gap-2">
             <button onClick={handleSearch} className="btn-premium btn-premium-primary px-4" disabled={loading}>
               {loading ? <span className="spinner-border spinner-border-sm me-2"></span> : <><i className="fa fa-search"></i> Search</>}
             </button>
             <button onClick={clearFilters} className="btn-premium btn-premium-secondary px-4">
-              <i className="fa fa-refresh"></i> Clear Filters
+              <i className="fa fa-refresh"></i> Clear
             </button>
           </div>
         </div>
