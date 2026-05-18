@@ -14,13 +14,13 @@
  echo Pulling latest code from GitHub... 
  :: Ensure Git treats this directory as safe 
  git config --global --add safe.directory C:/SYNERGY_HRPAY 
- :: Stash local changes to prevent merge conflicts 
- git stash 
+ :: Stash local changes (including untracked files) to prevent merge conflicts 
+ git stash -u 
  git pull origin main 
  :: Re-apply stashed changes (like settings files) 
  git stash pop 
  if %ERRORLEVEL% neq 0 ( 
-     echo [INFO] No local changes to re-apply or merge handled. 
+     echo [INFO] Merge handled or no local changes to re-apply. 
  ) 
  
  echo ============================ 
