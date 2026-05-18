@@ -35,7 +35,7 @@ const synHRM_Cost_Allocation_Report = async (req, res) => {
     request.input('designation', sql.Int, designation ? parseInt(designation) : null);
     request.input('user', sql.Int, 1); // Default user ID
 
-    const result = await request.execute('procHRM_Cost_Allocation_Report');
+    const result = await request.execute('synHRM_Cost_Allocation_Report');
 
     // Handle results based on mode
     if (parseInt(mode) === 1) {
@@ -81,7 +81,10 @@ const synHRM_Cost_Allocation_Report = async (req, res) => {
         searchCriteria,
         footer: footer ? footer.reportFooter : '',
         companyName: companyInfo ? companyInfo.COMPANY_NAME : '',
-        columns: reportData.length > 0 ? Object.keys(reportData[0]) : []
+        columns: reportData.length > 0 ? Object.keys(reportData[0]) : [],
+        // Adding summary placeholders to match frontend expectations
+        departmentSummary: [],
+        employeeSummary: []
       });
     }
   } catch (error) {
@@ -125,7 +128,7 @@ const synHRM_Cost_Allocation_Report_Export = async (req, res) => {
     request.input('department', sql.Int, department ? parseInt(department) : null);
     request.input('designation', sql.Int, designation ? parseInt(designation) : null);
 
-    const result = await request.execute('procHRM_Cost_Allocation_Report');
+    const result = await request.execute('synHRM_Cost_Allocation_Report');
     const records = result.recordsets[0] || [];
 
     if (records.length === 0 || (records.length === 1 && records[0].Sites === 'No Data Found')) {
