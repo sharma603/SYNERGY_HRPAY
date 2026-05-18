@@ -20,6 +20,8 @@ const PAGES = [
   { id: 'report-employee-site-location', label: 'Report: Employee Site Location', icon: 'fa-map-marker' },
   { id: 'user-roles', label: 'User Roles', icon: 'fa-shield' },
   { id: 'message-broadcast', label: 'Message Broadcast', icon: 'fa-bullhorn' },
+  { id: 'absentee-notification', label: 'Absentee Notification', icon: 'fa-user-times' },
+  { id: 'holidays', label: 'Holidays', icon: 'fa-calendar-check-o' },
   { id: 'settings', label: 'Settings', icon: 'fa-cog' }
 ];
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, Button, Card, Table, Spinner, Alert, Badge, Modal } from 'react-bootstrap';
 import Select from 'react-select';
-import { attendanceAPI, authAPI } from '../services/api';
+import { attendanceAPI, authAPI, holidayAPI } from '../services/api';
 import '../PremiumTheme.css';
 
 function AbsenteeNotification() {
@@ -20,6 +20,8 @@ function AbsenteeNotification() {
   });
   const [selectedAbsentees, setSelectedAbsentees] = useState([]);
   const [status, setStatus] = useState({ show: false, message: '', variant: 'success' });
+  const [isHoliday, setIsHoliday] = useState(null);
+  const [holidays, setHolidays] = useState([]);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   
   const daysOfWeek = [
@@ -71,7 +73,17 @@ function AbsenteeNotification() {
   useEffect(() => {
     fetchSettings();
     fetchMasterData();
+    fetchHolidays();
   }, []);
+
+  const fetchHolidays = async () => {
+    try {
+      const response = await holidayAPI.getAll();
+      setHolidays(response.data || []);
+    } catch (err) {
+      console.error('Error fetching holidays:', err);
+    }
+  };
 
   useEffect(() => {
     fetchAbsentees(1);
@@ -107,16 +119,28 @@ function AbsenteeNotification() {
     }
   };
 
-  const handleSaveAutomation = async () => {
+  const handleSaveAutomation = async (updatedAutomation = automation, silent = false) => {
     try {
-      setLoading(true);
-      await attendanceAPI.updateAbsenteeSettings(automation);
-      setStatus({ show: true, message: 'Automation settings saved successfully!', variant: 'success' });
+      if (!silent) setLoading(true);
+      await attendanceAPI.updateAbsenteeSettings(updatedAutomation);
+      if (!silent) setStatus({ show: true, message: 'Automation settings saved successfully!', variant: 'success' });
     } catch (err) {
       console.error('Error saving automation settings:', err);
-      setStatus({ show: true, message: 'Failed to save automation settings.', variant: 'danger' });
+      if (!silent) setStatus({ show: true, message: 'Failed to save automation settings.', variant: 'danger' });
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
+    }
+  };
+
+  const updateAutomationSetting = async (key, value) => {
+    const newAutomation = {
+      ...automation,
+      [activeTab]: { ...automation[activeTab], [key]: value }
+    };
+    setAutomation(newAutomation);
+    // Auto-save for critical settings
+    if (['enabled', 'time', 'department', 'section', 'lateThreshold'].includes(key)) {
+      await handleSaveAutomation(newAutomation, true);
     }
   };
 
@@ -126,13 +150,21 @@ function AbsenteeNotification() {
       const threshold = automation.late.lateThreshold || '08:20';
       const rules = automation.late.sectionRules || [];
       const response = await attendanceAPI.getAbsentees(date, pageNumber, pagination.limit, activeTab, threshold, selectedSection, selectedDepartment, rules);
-      setAbsentees(response.data.data || []);
-      setTotalAbsentees(response.data.pagination?.total || 0);
-      setPagination(prev => ({
-        ...prev,
-        page: response.data.pagination?.page || 1,
-        totalPages: response.data.pagination?.totalPages || 0
-      }));
+      
+      if (response.data.holiday) {
+        setIsHoliday(response.data.holiday);
+        setAbsentees([]);
+        setTotalAbsentees(0);
+      } else {
+        setIsHoliday(null);
+        setAbsentees(response.data.data || []);
+        setTotalAbsentees(response.data.pagination?.total || 0);
+        setPagination(prev => ({
+          ...prev,
+          page: response.data.pagination?.page || 1,
+          totalPages: response.data.pagination?.totalPages || 0
+        }));
+      }
       setSelectedAbsentees([]); // Reset selection on data change
     } catch (err) {
       console.error('Error fetching employee list:', err);
@@ -258,6 +290,16 @@ function AbsenteeNotification() {
         </Alert>
       )}
 
+      {isHoliday && (
+        <Alert variant="info" className="border-0 shadow-sm d-flex align-items-center">
+          <i className="fa fa-calendar-check-o me-3 fa-lg"></i>
+          <div>
+            <div className="fw-bold">Company Holiday: {isHoliday}</div>
+            <div className="small">Notifications are automatically disabled for this date.</div>
+          </div>
+        </Alert>
+      )}
+
       <Row>
         <Col lg={4} className="pe-lg-4">
           <Card className="border-0 shadow-sm mb-4" style={{ borderRadius: '12px', borderLeft: '4px solid #334155' }}>
@@ -279,10 +321,7 @@ function AbsenteeNotification() {
                   id="auto-switch"
                   className="custom-switch-lg"
                   checked={automation[activeTab].enabled}
-                  onChange={(e) => setAutomation({
-                    ...automation, 
-                    [activeTab]: { ...automation[activeTab], enabled: e.target.checked }
-                  })}
+                  onChange={(e) => updateAutomationSetting('enabled', e.target.checked)}
                 />
               </Form.Group>
 
@@ -295,10 +334,7 @@ function AbsenteeNotification() {
                     className="form-control-sm border-start-0 ps-0"
                     style={{ backgroundColor: automation[activeTab].enabled ? 'white' : '#f1f5f9' }}
                     value={automation[activeTab].time}
-                    onChange={(e) => setAutomation({
-                      ...automation, 
-                      [activeTab]: { ...automation[activeTab], time: e.target.value }
-                    })}
+                    onChange={(e) => updateAutomationSetting('time', e.target.value)}
                     disabled={!automation[activeTab].enabled}
                   />
                 </div>
@@ -312,10 +348,7 @@ function AbsenteeNotification() {
                     <Select
                       name="auto-department"
                       value={automation[activeTab].department ? { value: automation[activeTab].department, label: automation[activeTab].department } : null}
-                      onChange={(opt) => setAutomation({
-                        ...automation,
-                        [activeTab]: { ...automation[activeTab], department: opt ? opt.value : '' }
-                      })}
+                      onChange={(opt) => updateAutomationSetting('department', opt ? opt.value : '')}
                       options={masterData.departments.map(d => ({ value: d.name, label: d.name }))}
                       placeholder="All Departments"
                       isClearable
@@ -346,10 +379,7 @@ function AbsenteeNotification() {
                     <Select
                       name="auto-section"
                       value={automation[activeTab].section ? { value: automation[activeTab].section, label: automation[activeTab].section } : null}
-                      onChange={(opt) => setAutomation({
-                        ...automation,
-                        [activeTab]: { ...automation[activeTab], section: opt ? opt.value : '' }
-                      })}
+                      onChange={(opt) => updateAutomationSetting('section', opt ? opt.value : '')}
                       options={masterData.sections.map(s => ({ value: s.name, label: s.name }))}
                       placeholder="All Sections"
                       isClearable
@@ -382,10 +412,7 @@ function AbsenteeNotification() {
                       className="form-control-sm border-start-0 ps-0"
                       style={{ backgroundColor: automation.late.enabled ? 'white' : '#f1f5f9' }}
                       value={automation.late.lateThreshold || '08:20'}
-                      onChange={(e) => setAutomation({
-                        ...automation, 
-                        late: { ...automation.late, lateThreshold: e.target.value }
-                      })}
+                      onChange={(e) => updateAutomationSetting('lateThreshold', e.target.value)}
                       disabled={!automation.late.enabled}
                     />
                   </div>
@@ -541,7 +568,7 @@ function AbsenteeNotification() {
                   variant="dark" 
                   className="w-100 btn-sm fw-bold py-2 shadow-sm"
                   style={{ backgroundColor: '#334155', border: 'none', borderRadius: '8px' }}
-                  disabled={loading || selectedAbsentees.length === 0}
+                  disabled={loading || selectedAbsentees.length === 0 || isHoliday}
                 >
                   {loading ? <Spinner size="sm" /> : <><i className="fa fa-paper-plane me-2"></i> Send to ({selectedAbsentees.length})</>}
                 </Button>
@@ -592,7 +619,15 @@ function AbsenteeNotification() {
                     ) : absentees.length === 0 ? (
                       <tr>
                         <td colSpan={activeTab === 'late' ? "6" : "5"} className="text-center p-5 text-muted small">
-                          No {activeTab === 'absent' ? 'absentees' : 'late comers'} found for this date.
+                          {isHoliday ? (
+                            <>
+                              <i className="fa fa-calendar-check-o fa-2x mb-3 d-block opacity-25"></i>
+                              Today is a company holiday (<strong>{isHoliday}</strong>).<br/>
+                              No attendance tracking or notifications required.
+                            </>
+                          ) : (
+                            `No ${activeTab === 'absent' ? 'absentees' : 'late comers'} found for this date.`
+                          )}
                         </td>
                       </tr>
                     ) : (
@@ -897,6 +932,30 @@ function AbsenteeNotification() {
           )}
 
           <div className="mt-4">
+            <div className="bg-light p-3 rounded-3 border mb-3">
+              <h6 className="small fw-bold text-dark text-uppercase mb-2 d-flex align-items-center">
+                <i className="fa fa-info-circle me-2 text-info"></i> Holiday Policy
+              </h6>
+              <p className="text-muted mb-0" style={{ fontSize: '0.75rem' }}>
+                Automation will <strong>automatically skip</strong> any days registered in the Holiday Management system.
+              </p>
+              {holidays.filter(h => new Date(h.HRH_FROM_DT) >= new Date()).length > 0 && (
+                <div className="mt-2 pt-2 border-top">
+                  <div className="text-dark fw-bold mb-1" style={{ fontSize: '0.7rem' }}>Upcoming Holidays:</div>
+                  <div className="d-flex flex-wrap gap-1">
+                    {holidays
+                      .filter(h => new Date(h.HRH_FROM_DT) >= new Date())
+                      .slice(0, 3)
+                      .map((h, i) => (
+                        <Badge key={i} bg="white" text="dark" className="border fw-normal" style={{ fontSize: '0.65rem' }}>
+                          {h.HRH_DESC} ({new Date(h.HRH_FROM_DT).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })})
+                        </Badge>
+                      ))
+                    }
+                  </div>
+                </div>
+              )}
+            </div>
             <Button 
               variant="dark" 
               className="w-100 fw-bold py-2 shadow-sm"

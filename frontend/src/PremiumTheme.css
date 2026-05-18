@@ -178,8 +178,15 @@
 .transition-all { transition: all 0.2s ease-in-out; }
 
 /* Premium Table */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .table-premium {
   width: 100%;
+  min-width: 1200px;
   border-collapse: separate;
   border-spacing: 0;
   border: 1px solid var(--border-color);

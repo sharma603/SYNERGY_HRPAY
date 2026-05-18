@@ -42,19 +42,24 @@ const getAttendanceRegisterAll = async (req, res) => {
     let allRecords = result.recordsets[0] || []; 
     const footerInfo = result.recordsets[1] ? result.recordsets[1][0] : null; 
  
-    // Fetch employee locations
-    const locPool = await getConnection(); 
-    const locResult = await locPool.request().query(` 
-      SELECT e.EMP_Code, c.COM_DESC as LocationName 
+    // Fetch employee locations and departments
+    const extraPool = await getConnection(); 
+    const extraResult = await extraPool.request().query(` 
+      SELECT e.EMP_Code, loc.COM_DESC as LocationName, dept.COM_DESC as DepartmentName
       FROM HRM_EMP_MASTER e 
-      LEFT JOIN COMMONCODES c ON e.EMP_LOC_DR = c.COM_SLNO AND c.COM_TYPE = 38 
+      LEFT JOIN COMMONCODES loc ON e.EMP_LOC_DR = loc.COM_SLNO AND loc.COM_TYPE = 38
+      LEFT JOIN COMMONCODES dept ON e.EMP_DEPT_DR = dept.COM_SLNO AND dept.COM_TYPE = 39
     `); 
-    const locMap = new Map(locResult.recordset.map(l => [l.EMP_Code, l.LocationName])); 
+    const extraMap = new Map(extraResult.recordset.map(r => [r.EMP_Code, { location: r.LocationName, department: r.DepartmentName }])); 
  
-    let mappedRecords = allRecords.map(record => ({
-      ...record,
-      LOCATION: locMap.get(record.RAW_EMPCODE) || record.LOCATION || '-'
-    }));
+    let mappedRecords = allRecords.map(record => {
+      const extraData = extraMap.get(record.RAW_EMPCODE) || { location: '-', department: '-' };
+      return {
+        ...record,
+        LOCATION_NAME: extraData.location || record.LOCATION || '-',
+        DEPARTMENT_NAME: extraData.department || '-'
+      };
+    });
 
     // Sort by Date then Time ascending
     mappedRecords.sort((a, b) => {

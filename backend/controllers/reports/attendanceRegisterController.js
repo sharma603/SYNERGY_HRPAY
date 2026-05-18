@@ -39,40 +39,56 @@ const getAttendanceRegister = async (req, res) => {
     const allRecords = result.recordsets[0] || [];
     const footerInfo = result.recordsets[1] ? result.recordsets[1][0] : null;
 
-    const locPool = await getConnection();
-    const locResult = await locPool.request().query(`
-      SELECT e.EMP_Code, c.COM_DESC as LocationName
+    const extraPool = await getConnection();
+    const extraResult = await extraPool.request().query(`
+      SELECT e.EMP_Code, loc.COM_DESC as LocationName, dept.COM_DESC as DepartmentName
       FROM HRM_EMP_MASTER e
-      LEFT JOIN COMMONCODES c ON e.EMP_LOC_DR = c.COM_SLNO AND c.COM_TYPE = 38
+      LEFT JOIN COMMONCODES loc ON e.EMP_LOC_DR = loc.COM_SLNO AND loc.COM_TYPE = 38
+      LEFT JOIN COMMONCODES dept ON e.EMP_DEPT_DR = dept.COM_SLNO AND dept.COM_TYPE = 39
     `);
-    const locMap = new Map(locResult.recordset.map(l => [l.EMP_Code, l.LocationName]));
+    const extraDataMap = new Map(extraResult.recordset.map(r => [r.EMP_Code, { location: r.LocationName, department: r.DepartmentName }]));
 
     const groupedMap = new Map();
 
     allRecords.forEach(record => {
       const key = `${record.RAW_EMPCODE}_${record.DATE}`;
-      const locationName = locMap.get(record.RAW_EMPCODE) || record.LOC_NAME || record.LOCATION || '-';
+      const extraData = extraDataMap.get(record.RAW_EMPCODE) || { location: '-', department: '-' };
+      const locationName = extraData.location || record.LOC_NAME || record.LOCATION || '-';
+      const departmentName = extraData.department || '-';
+
+      // Support both RAW_LOCATION_MOB from my suggestion or direct names if added to SP
+      const recordLocation = record.RAW_LOCATION_MOB || 
+                            (record.RAW_DIRECTION === 'IN' ? record.ATT_IN_LOCATION_MOB : record.ATT_OUT_LOCATION_MOB) ||
+                            record.LOCATION_MOB;
 
       if (!groupedMap.has(key)) {
         groupedMap.set(key, {
           ...record,
           LOCATION_NAME: locationName,
+          DEPARTMENT_NAME: departmentName,
           CHECK_IN: record.RAW_DIRECTION === 'IN' ? record.TIME : null,
-          CHECK_OUT: record.RAW_DIRECTION === 'OUT' ? record.TIME : null
+          CHECK_OUT: record.RAW_DIRECTION === 'OUT' ? record.TIME : null,
+          IN_LOCATION_MOB: record.RAW_DIRECTION === 'IN' ? recordLocation : null,
+          OUT_LOCATION_MOB: record.RAW_DIRECTION === 'OUT' ? recordLocation : null
         });
       } else {
         const existing = groupedMap.get(key);
         if (existing.LOCATION_NAME === '-' && locationName !== '-') {
           existing.LOCATION_NAME = locationName;
         }
+        if (existing.DEPARTMENT_NAME === '-' && departmentName !== '-') {
+          existing.DEPARTMENT_NAME = departmentName;
+        }
 
         if (record.RAW_DIRECTION === 'IN') {
           if (!existing.CHECK_IN || record.TIME < existing.CHECK_IN) {
             existing.CHECK_IN = record.TIME;
+            existing.IN_LOCATION_MOB = recordLocation;
           }
         } else if (record.RAW_DIRECTION === 'OUT') {
           if (!existing.CHECK_OUT || record.TIME > existing.CHECK_OUT) {
             existing.CHECK_OUT = record.TIME;
+            existing.OUT_LOCATION_MOB = recordLocation;
           }
         }
       }

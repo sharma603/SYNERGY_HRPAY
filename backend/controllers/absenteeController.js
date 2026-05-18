@@ -27,6 +27,28 @@ const getAbsentees = async (req, res) => {
     const limitNum = parseInt(limit);
     const offset = (pageNum - 1) * limitNum;
 
+    // 0. Check if today is a holiday
+    const holidayCheck = await pool.request()
+      .input('today', sql.Date, date)
+      .query(`
+          SELECT TOP 1 HRH_DESC 
+          FROM HRM_HOLIDAY 
+          WHERE @today BETWEEN HRH_FROM_DT AND HRH_TO_DATE
+      `);
+
+    if (holidayCheck.recordset.length > 0) {
+      return res.json({
+        data: [],
+        holiday: holidayCheck.recordset[0].HRH_DESC,
+        pagination: {
+          total: 0,
+          page: pageNum,
+          limit: limitNum,
+          totalPages: 0
+        }
+      });
+    }
+
     // 0. Get Company Name
     const companyResult = await pool.request().query('SELECT TOP 1 COM_NAME FROM COMPANY');
     const companyName = companyResult.recordset[0]?.COM_NAME || 'SYNERGY HRPAY';

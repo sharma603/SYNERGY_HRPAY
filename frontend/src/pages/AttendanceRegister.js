@@ -129,6 +129,15 @@ import React, { useState, useEffect, useCallback } from 'react';
      }); 
    }; 
  
+   const formatLocation = (loc) => { 
+     if (!loc || loc === '-') return '-'; 
+     // Remove "Latitude: ..., Longitude: ... ||" part if it exists 
+     if (loc.includes('||')) { 
+       return loc.split('||')[1].trim(); 
+     } 
+     return loc; 
+   }; 
+ 
    const exportToExcel = async () => { 
      try { 
        setLoading(true); 
@@ -143,10 +152,12 @@ import React, { useState, useEffect, useCallback } from 'react';
          "S/N": index + 1, 
          "EMP CODE": row.RAW_EMPCODE, 
          "EMPLOYEE NAME": row.EMP_NAME, 
+         "DEPARTMENT": row.DEPARTMENT_NAME || '-',
          "LOCATION": row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-', 
          "DATE": row.DATE, 
          "CHECK IN": row.CHECK_IN || '-', 
          "CHECK OUT": row.CHECK_OUT || '-', 
+         "LOCATION (MOB)": `${formatLocation(row.IN_LOCATION_MOB) || '-'} || ${formatLocation(row.OUT_LOCATION_MOB) || '-'}`,
          "DIRECTION": row.RAW_DIRECTION 
        })); 
  
@@ -181,17 +192,19 @@ import React, { useState, useEffect, useCallback } from 'react';
        doc.text(`Period: ${filters.fromDate} to ${filters.toDate}`, 14, 22); 
        doc.text(`Printed By: ${footerInfo?.PRINTEDUSER || 'System'} | Date: ${footerInfo?.DATE || ''}`, 14, 27); 
  
-       const tableColumn = ["S/N", "EMP CODE", "EMPLOYEE NAME", "LOCATION", "DATE", "CHECK IN", "CHECK OUT", "DIRECTION"]; 
+       const tableColumn = ["S/N", "EMP CODE", "EMPLOYEE NAME", "DEPARTMENT", "LOCATION", "DATE", "CHECK IN", "CHECK OUT", "LOCATION (MOB)", "DIRECTION"]; 
        const tableRows = allData.map((row, index) => [ 
          index + 1, 
          row.RAW_EMPCODE, 
          row.EMP_NAME, 
+         row.DEPARTMENT_NAME || '-',
          row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-', 
          row.DATE, 
          row.CHECK_IN || '-', 
-         row.CHECK_OUT || '-', 
-         row.RAW_DIRECTION 
-       ]); 
+           row.CHECK_OUT || '-', 
+           `${formatLocation(row.IN_LOCATION_MOB) || '-'} || ${formatLocation(row.OUT_LOCATION_MOB) || '-'}`,
+           row.RAW_DIRECTION 
+         ]); 
  
        autoTable(doc, { 
          head: [tableColumn], 
@@ -371,10 +384,12 @@ import React, { useState, useEffect, useCallback } from 'react';
                    <th>S/N</th> 
                    <th>EMP CODE</th> 
                    <th>EMPLOYEE NAME</th> 
+                   <th>DEPARTMENT</th>
                    <th>LOCATION</th> 
                    <th>DATE</th> 
                    <th>CHECK IN</th> 
                    <th>CHECK OUT</th> 
+                   <th>LOCATION (MOB)</th>
                    <th>DIRECTION</th> 
                  </tr> 
                </thead> 
@@ -384,12 +399,18 @@ import React, { useState, useEffect, useCallback } from 'react';
                      <td>{index + 1}</td> 
                      <td>{row.RAW_EMPCODE}</td> 
                      <td className="fw-bold">{row.EMP_NAME}</td> 
+                     <td>{row.DEPARTMENT_NAME || '-'}</td>
                      <td>{row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-'}</td> 
                      <td>{row.DATE}</td> 
                      <td>{row.CHECK_IN || '-'}</td> 
                      <td>{row.CHECK_OUT || '-'}</td> 
+                     <td className="small text-muted">
+                       {formatLocation(row.IN_LOCATION_MOB) || '-'} 
+                       <span className="mx-2 text-primary fw-bold">||</span>
+                       {formatLocation(row.OUT_LOCATION_MOB) || '-'}
+                     </td>
                      <td> 
-                       <span className={`badge-premium ${row.RAW_DIRECTION === 'IN' ? 'badge-premium-dark' : 'badge-premium-gray'}`}> 
+                       <span className={`badge-premium ${row.RAW_DIRECTION === 'IN' ? 'badge-premium-blue' : 'badge-premium-red'}`}> 
                          {row.RAW_DIRECTION} 
                        </span> 
                      </td> 

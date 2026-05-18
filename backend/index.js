@@ -54,6 +54,7 @@ const leaveRoutes = require('./routes/leaves');
 const dashboardRoutes = require('./routes/dashboard');
 const authRoutes = require('./routes/auth');
 const emailRoutes = require('./routes/email');
+const holidayRoutes = require('./routes/holidays');
 
 app.use('/api', employeeRoutes);
 app.use('/api', attendanceRoutes);
@@ -62,6 +63,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/email', emailRoutes);
+app.use('/api/holidays', holidayRoutes);
 
 // 404 handler
 app.use((req, res) => {

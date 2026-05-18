@@ -50,6 +50,15 @@ function AttendanceRegisterAll() {
   const [showAttendanceSummary, setShowAttendanceSummary] = useState(false);
   const [summaryType, setSummaryModalType] = useState('Absent'); // 'Absent' or 'Vacation'
 
+  const formatLocation = (loc) => { 
+    if (!loc || loc === '-') return '-'; 
+    // Remove "Latitude: ..., Longitude: ... ||" part if it exists 
+    if (loc.includes('||')) { 
+      return loc.split('||')[1].trim(); 
+    } 
+    return loc; 
+  }; 
+
   const fetchMasterData = async () => {
     try {
       const response = await authAPI.getMasterData();
@@ -231,10 +240,12 @@ function AttendanceRegisterAll() {
       "S/N": index + 1,
       "EMP CODE": row.RAW_EMPCODE,
       "EMPLOYEE NAME": row.EMP_NAME,
-      "LOCATION": row.LOCATION || '-',
+      "DEPARTMENT": row.DEPARTMENT_NAME || '-',
+      "LOCATION": row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-',
       "DATE": row.DATE,
       "TIME": row.TIME || '-',
       "DIRECTION": row.RAW_DIRECTION || '-',
+      "LOCATION (MOB)": formatLocation(row.RAW_LOCATION_MOB),
       "STATUS": row.STATUS
     }));
 
@@ -254,15 +265,17 @@ function AttendanceRegisterAll() {
     doc.setFontSize(10);
     doc.text(`Period: ${filters.fromDate} to ${filters.toDate}`, 14, 22);
 
-    const tableColumn = ["S/N", "EMP CODE", "EMPLOYEE NAME", "LOCATION", "DATE", "TIME", "DIRECTION", "STATUS"];
+    const tableColumn = ["S/N", "EMP CODE", "EMPLOYEE NAME", "DEPARTMENT", "LOCATION", "DATE", "TIME", "DIRECTION", "LOCATION (MOB)", "STATUS"];
     const tableRows = data.map((row, index) => [
       index + 1,
       row.RAW_EMPCODE,
       row.EMP_NAME,
-      row.LOCATION || '-',
+      row.DEPARTMENT_NAME || '-',
+      row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-',
       row.DATE,
       row.TIME || '-',
       row.RAW_DIRECTION || '-',
+      formatLocation(row.RAW_LOCATION_MOB),
       row.STATUS
     ]);
 
@@ -317,10 +330,12 @@ function AttendanceRegisterAll() {
       "S/N": index + 1,
       "EMP CODE": row.RAW_EMPCODE,
       "EMPLOYEE NAME": row.EMP_NAME,
-      "LOCATION": row.LOCATION || '-',
+      "DEPARTMENT": row.DEPARTMENT_NAME || '-',
+      "LOCATION": row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-',
       "DATE": row.DATE,
       "TIME": row.TIME,
       "DIRECTION": row.RAW_DIRECTION,
+      "LOCATION (MOB)": formatLocation(row.RAW_LOCATION_MOB),
       "STATUS": row.STATUS
     }));
 
@@ -341,15 +356,17 @@ function AttendanceRegisterAll() {
     doc.text(`Period: ${filters.fromDate} to ${filters.toDate}`, 14, 22);
     doc.text(`Printed By: ${footerInfo?.PRINTEDUSER || 'System'} | Date: ${footerInfo?.DATE || ''}`, 14, 27);
 
-    const tableColumn = ["S/N", "EMP CODE", "EMPLOYEE NAME", "LOCATION", "DATE", "TIME", "DIRECTION", "STATUS"];
+    const tableColumn = ["S/N", "EMP CODE", "EMPLOYEE NAME", "DEPARTMENT", "LOCATION", "DATE", "TIME", "DIRECTION", "LOCATION (MOB)", "STATUS"];
     const tableRows = allFilteredData.map((row, index) => [
       index + 1,
       row.RAW_EMPCODE,
       row.EMP_NAME,
-      row.LOCATION || '-',
+      row.DEPARTMENT_NAME || '-',
+      row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-',
       row.DATE,
       row.TIME,
       row.RAW_DIRECTION,
+      formatLocation(row.RAW_LOCATION_MOB),
       row.STATUS
     ]);
 
@@ -597,10 +614,12 @@ function AttendanceRegisterAll() {
                   <th>S/N</th>
                   <th>EMP CODE</th>
                   <th>EMPLOYEE NAME</th>
+                  <th>DEPARTMENT</th>
                   <th>LOCATION</th>
                   <th>DATE</th>
                   <th>TIME</th>
                   <th>DIRECTION</th>
+                  <th>LOCATION (MOB)</th>
                   <th>STATUS</th>
                 </tr>
               </thead>
@@ -610,7 +629,8 @@ function AttendanceRegisterAll() {
                     <td>{index + 1}</td>
                     <td>{row.RAW_EMPCODE}</td>
                     <td className="fw-bold">{row.EMP_NAME}</td>
-                    <td>{row.LOCATION || '-'}</td>
+                    <td>{row.DEPARTMENT_NAME || '-'}</td>
+                    <td>{row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-'}</td>
                     <td>{row.DATE}</td>
                     <td>{row.TIME}</td>
                     <td>
@@ -618,6 +638,7 @@ function AttendanceRegisterAll() {
                         {row.RAW_DIRECTION}
                       </span>
                     </td>
+                    <td className="small text-muted">{formatLocation(row.RAW_LOCATION_MOB)}</td>
                     <td className="fw-bold">
                       {editingStatus === `${row.RAW_EMPCODE}_${row.DATE}` ? (
                         <Select
@@ -709,10 +730,12 @@ function AttendanceRegisterAll() {
                    <th>S/N</th>
                    <th>EMP CODE</th>
                    <th>EMPLOYEE NAME</th>
+                   <th>DEPARTMENT</th>
                    <th>LOCATION</th>
                    <th>DATE</th>
                    <th>TIME</th>
                    <th>DIRECTION</th>
+                   <th>LOCATION (MOB)</th>
                    <th>STATUS</th>
                  </tr>
                </thead>
@@ -723,7 +746,8 @@ function AttendanceRegisterAll() {
                        <td>{idx + 1}</td>
                        <td>{row.RAW_EMPCODE}</td>
                        <td className="fw-bold">{row.EMP_NAME}</td>
-                       <td>{row.LOCATION || '-'}</td>
+                       <td>{row.DEPARTMENT_NAME || '-'}</td>
+                       <td>{row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-'}</td>
                        <td>{row.DATE}</td>
                        <td>{row.TIME || '-'}</td>
                        <td>
@@ -731,6 +755,7 @@ function AttendanceRegisterAll() {
                            {row.RAW_DIRECTION || '-'}
                          </span>
                        </td>
+                       <td className="small text-muted">{formatLocation(row.RAW_LOCATION_MOB)}</td>
                        <td className="fw-bold">
                          <span className={`badge-premium ${row.STATUS === 'Present' ? 'badge-premium-green' : row.STATUS === 'Absent' ? 'badge-premium-red' : 'badge-premium-blue'}`}>
                            {row.STATUS}

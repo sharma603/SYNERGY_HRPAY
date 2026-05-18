@@ -114,6 +114,12 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse, user }) {
                 <span className="nav-text">Absentee Notification</span>
               </Link>
             )}
+            {hasAccess('holidays') && (
+              <Link to="/holidays" onClick={onClose} title="Holidays" className={`nav-link-custom ${isActive('/holidays') ? 'active' : ''}`}>
+                <span className="nav-icon"><i className="fa fa-calendar-check-o text-primary"></i></span>
+                <span className="nav-text">Holidays</span>
+              </Link>
+            )}
           </>
         )}
       </div>

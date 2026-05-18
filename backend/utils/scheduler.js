@@ -40,6 +40,20 @@ const checkAndNotify = async (type = 'absent') => {
         const pool = await getConnection();
         const today = new Date().toISOString().split('T')[0];
 
+        // 0. Check if today is a holiday
+        const holidayCheck = await pool.request()
+            .input('today', sql.Date, today)
+            .query(`
+                SELECT TOP 1 HRH_DESC 
+                FROM HRM_HOLIDAY 
+                WHERE @today BETWEEN HRH_FROM_DT AND HRH_TO_DATE
+            `);
+
+        if (holidayCheck.recordset.length > 0) {
+            console.log(`[Scheduler] Today is a holiday (${holidayCheck.recordset[0].HRH_DESC}). Skipping ${type} notifications.`);
+            return;
+        }
+
         // 1. Get all active employees with emails and filters
         let query = `
             SELECT 

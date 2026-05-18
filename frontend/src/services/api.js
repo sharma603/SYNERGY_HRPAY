@@ -111,6 +111,11 @@ export const dashboardAPI = {
   getStats: () => apiClient.get('/dashboard/stats')
 };
 
+// Holiday APIs
+export const holidayAPI = {
+  getAll: () => apiClient.get('/holidays')
+};
+
 // Email APIs
 export const emailAPI = {
   send: (data) => apiClient.post('/email/send', data)

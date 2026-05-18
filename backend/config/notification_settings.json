@@ -7,7 +7,8 @@
       2,
       3,
       4,
-      0
+      0,
+      6
     ],
     "subject": "Absence Notification",
     "message": "Hope you're doing well,\n\nWe have noticed that you were absent today without prior notice.\n\nIf you have missed your check-in or were on official duty outside the office, kindly ensure that your attendance is registered or your leave request (according to the applicable leave type) is submitted through the system to avoid the day being recorded as an absence.\n\nThank you for your cooperation, and we wish you a pleasant day.",
@@ -15,7 +16,7 @@
     "section": "STAFF A"
   },
   "late": {
-    "enabled": true,
+    "enabled": false,
     "time": "09:00",
     "days": [
       1,
