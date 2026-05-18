@@ -3,7 +3,7 @@ const { getConnection, sql } = require('../../config/database');
 /**
  * Get Cost Allocation Report using stored procedure procHRM_Cost_Allocation_Report
  */
-const getCostAllocationReport = async (req, res) => {
+const synHRM_Cost_Allocation_Report = async (req, res) => {
   try {
     const params = req.method === 'POST' ? req.body : req.query;
     const {
@@ -85,7 +85,7 @@ const getCostAllocationReport = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Error in getCostAllocationReport:', error);
+    console.error('Error in synHRM_Cost_Allocation_Report:', error);
     res.status(500).json({ error: 'Failed to fetch cost allocation report', details: error.message });
   }
 };
@@ -93,7 +93,7 @@ const getCostAllocationReport = async (req, res) => {
 /**
  * Export Cost Allocation Report
  */
-const exportCostAllocationReport = async (req, res) => {
+const synHRM_Cost_Allocation_Report_Export = async (req, res) => {
   try {
     const {
       payGroup,
@@ -153,6 +153,6 @@ const exportCostAllocationReport = async (req, res) => {
 };
 
 module.exports = {
-  getCostAllocationReport,
-  exportCostAllocationReport
+  synHRM_Cost_Allocation_Report,
+  synHRM_Cost_Allocation_Report_Export
 };

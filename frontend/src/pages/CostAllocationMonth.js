@@ -30,12 +30,12 @@ function CostAllocationMonth() {
   const fetchFilterOptions = useCallback(async () => {
     try {
       // Use mode 1 and 2 to get initial options
-      const pgResponse = await costAllocationAPI.getReport({ mode: 1 });
+      const pgResponse = await costAllocationAPI.synHRM_Cost_Allocation_Report({ mode: 1 });
       const payGroups = pgResponse.data.filters.payGroups;
       
       if (payGroups && payGroups.length > 0) {
         // Get periods for the first group by default to populate options
-        const ppResponse = await costAllocationAPI.getReport({ mode: 2, payGroup: payGroups[0].id });
+        const ppResponse = await costAllocationAPI.synHRM_Cost_Allocation_Report({ mode: 2, payGroup: payGroups[0].id });
         setFilterOptions({
           payPeriods: ppResponse.data.filters.payPeriods || [],
           designations: ppResponse.data.filters.designations || []

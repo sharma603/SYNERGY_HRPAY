@@ -83,7 +83,7 @@ function CostAllocationMonthWithFilter() {
       // 1. Fetch Pay Groups if not already fetched
       let payGroups = filterOptions.payGroups;
       if (payGroups.length === 0) {
-        const pgResponse = await costAllocationAPI.getReport({ mode: 1 });
+        const pgResponse = await costAllocationAPI.synHRM_Cost_Allocation_Report({ mode: 1 });
         payGroups = normalize(pgResponse.data.filters.payGroups || []);
       }
       
@@ -91,7 +91,7 @@ function CostAllocationMonthWithFilter() {
       
       if (activePayGroup) {
         // 2. Fetch all cascading filters based on selected Pay Group
-        const response = await costAllocationAPI.getReport({ 
+        const response = await costAllocationAPI.synHRM_Cost_Allocation_Report({ 
           mode: 2, 
           payGroup: activePayGroup 
         });

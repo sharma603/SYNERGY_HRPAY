@@ -59,7 +59,7 @@ function CostAllocationReport() {
         mode = currentFilters.payGroup ? 2 : 1;
       }
 
-      const response = await costAllocationAPI.getReport({
+      const response = await costAllocationAPI.synHRM_Cost_Allocation_Report({
         ...currentFilters,
         mode,
         page: pageNumber,

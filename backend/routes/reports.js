@@ -11,9 +11,9 @@ const attendanceRegisterAllController = require('../controllers/reports/attendan
 const employeeProjectController = require('../controllers/reports/employeeProjectController');
 
 // Cost Allocation Report routes - Restricted to Admin/HR
-router.get('/cost-allocation', auth, costAllocationController.getCostAllocationReport);
-router.post('/cost-allocation', auth, costAllocationController.getCostAllocationReport);
-router.get('/cost-allocation/export', auth, costAllocationController.exportCostAllocationReport);
+router.get('/cost-allocation', auth, costAllocationController.synHRM_Cost_Allocation_Report);
+router.post('/cost-allocation', auth, costAllocationController.synHRM_Cost_Allocation_Report);
+router.get('/cost-allocation/export', auth, costAllocationController.synHRM_Cost_Allocation_Report_Export);
 
 // Designation Summary routes
 router.get('/designation-summary', auth, designationSummaryController.synDesignationMultiPeriodSummary);
