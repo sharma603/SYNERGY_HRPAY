@@ -42,22 +42,24 @@ const getAttendanceRegisterAll = async (req, res) => {
     let allRecords = result.recordsets[0] || []; 
     const footerInfo = result.recordsets[1] ? result.recordsets[1][0] : null; 
  
-    // Fetch employee locations and departments
+    // Fetch employee locations, departments, and designations
     const extraPool = await getConnection(); 
     const extraResult = await extraPool.request().query(` 
-      SELECT e.EMP_Code, loc.COM_DESC as LocationName, dept.COM_DESC as DepartmentName
+      SELECT e.EMP_Code, loc.COM_DESC as LocationName, dept.COM_DESC as DepartmentName, desig.COM_DESC as DesignationName
       FROM HRM_EMP_MASTER e 
       LEFT JOIN COMMONCODES loc ON e.EMP_LOC_DR = loc.COM_SLNO AND loc.COM_TYPE = 38
       LEFT JOIN COMMONCODES dept ON e.EMP_DEPT_DR = dept.COM_SLNO AND dept.COM_TYPE = 39
+      LEFT JOIN COMMONCODES desig ON e.EMP_DESIG_DR = desig.COM_SLNO AND desig.COM_TYPE = 40
     `); 
-    const extraMap = new Map(extraResult.recordset.map(r => [r.EMP_Code, { location: r.LocationName, department: r.DepartmentName }])); 
+    const extraMap = new Map(extraResult.recordset.map(r => [r.EMP_Code, { location: r.LocationName, department: r.DepartmentName, designation: r.DesignationName }])); 
  
     let mappedRecords = allRecords.map(record => {
-      const extraData = extraMap.get(record.RAW_EMPCODE) || { location: '-', department: '-' };
+      const extraData = extraMap.get(record.RAW_EMPCODE) || { location: '-', department: '-', designation: '-' };
       return {
         ...record,
         LOCATION_NAME: extraData.location || record.LOCATION || '-',
-        DEPARTMENT_NAME: extraData.department || '-'
+        DEPARTMENT_NAME: extraData.department || '-',
+        DESIGNATION_NAME: extraData.designation || '-'
       };
     });
 

@@ -240,7 +240,7 @@ function AttendanceRegisterAll() {
       "S/N": index + 1,
       "EMP CODE": row.RAW_EMPCODE,
       "EMPLOYEE NAME": row.EMP_NAME,
-      "DEPARTMENT": row.DEPARTMENT_NAME || '-',
+      "DESIGNATION": row.DESIGNATION_NAME || '-',
       "LOCATION": row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-',
       "DATE": row.DATE,
       "TIME": row.TIME || '-',
@@ -265,12 +265,12 @@ function AttendanceRegisterAll() {
     doc.setFontSize(10);
     doc.text(`Period: ${filters.fromDate} to ${filters.toDate}`, 14, 22);
 
-    const tableColumn = ["S/N", "EMP CODE", "EMPLOYEE NAME", "DEPARTMENT", "LOCATION", "DATE", "TIME", "DIRECTION", "LOCATION (MOB)", "STATUS"];
+    const tableColumn = ["S/N", "EMP CODE", "EMPLOYEE NAME", "DESIGNATION", "LOCATION", "DATE", "TIME", "DIRECTION", "LOCATION (MOB)", "STATUS"];
     const tableRows = data.map((row, index) => [
       index + 1,
       row.RAW_EMPCODE,
       row.EMP_NAME,
-      row.DEPARTMENT_NAME || '-',
+      row.DESIGNATION_NAME || '-',
       row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-',
       row.DATE,
       row.TIME || '-',
@@ -330,7 +330,7 @@ function AttendanceRegisterAll() {
       "S/N": index + 1,
       "EMP CODE": row.RAW_EMPCODE,
       "EMPLOYEE NAME": row.EMP_NAME,
-      "DEPARTMENT": row.DEPARTMENT_NAME || '-',
+      "DESIGNATION": row.DESIGNATION_NAME || '-',
       "LOCATION": row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-',
       "DATE": row.DATE,
       "TIME": row.TIME,
@@ -356,12 +356,12 @@ function AttendanceRegisterAll() {
     doc.text(`Period: ${filters.fromDate} to ${filters.toDate}`, 14, 22);
     doc.text(`Printed By: ${footerInfo?.PRINTEDUSER || 'System'} | Date: ${footerInfo?.DATE || ''}`, 14, 27);
 
-    const tableColumn = ["S/N", "EMP CODE", "EMPLOYEE NAME", "DEPARTMENT", "LOCATION", "DATE", "TIME", "DIRECTION", "LOCATION (MOB)", "STATUS"];
+    const tableColumn = ["S/N", "EMP CODE", "EMPLOYEE NAME", "DESIGNATION", "LOCATION", "DATE", "TIME", "DIRECTION", "LOCATION (MOB)", "STATUS"];
     const tableRows = allFilteredData.map((row, index) => [
       index + 1,
       row.RAW_EMPCODE,
       row.EMP_NAME,
-      row.DEPARTMENT_NAME || '-',
+      row.DESIGNATION_NAME || '-',
       row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-',
       row.DATE,
       row.TIME,
@@ -614,7 +614,7 @@ function AttendanceRegisterAll() {
                   <th>S/N</th>
                   <th>EMP CODE</th>
                   <th>EMPLOYEE NAME</th>
-                  <th>DEPARTMENT</th>
+                  <th>DESIGNATION</th>
                   <th>LOCATION</th>
                   <th>DATE</th>
                   <th>TIME</th>
@@ -629,7 +629,7 @@ function AttendanceRegisterAll() {
                     <td>{index + 1}</td>
                     <td>{row.RAW_EMPCODE}</td>
                     <td className="fw-bold">{row.EMP_NAME}</td>
-                    <td>{row.DEPARTMENT_NAME || '-'}</td>
+                    <td>{row.DESIGNATION_NAME || '-'}</td>
                     <td>{row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-'}</td>
                     <td>{row.DATE}</td>
                     <td>{row.TIME}</td>
@@ -730,7 +730,7 @@ function AttendanceRegisterAll() {
                    <th>S/N</th>
                    <th>EMP CODE</th>
                    <th>EMPLOYEE NAME</th>
-                   <th>DEPARTMENT</th>
+                   <th>DESIGNATION</th>
                    <th>LOCATION</th>
                    <th>DATE</th>
                    <th>TIME</th>
@@ -746,7 +746,7 @@ function AttendanceRegisterAll() {
                        <td>{idx + 1}</td>
                        <td>{row.RAW_EMPCODE}</td>
                        <td className="fw-bold">{row.EMP_NAME}</td>
-                       <td>{row.DEPARTMENT_NAME || '-'}</td>
+                       <td>{row.DESIGNATION_NAME || '-'}</td>
                        <td>{row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-'}</td>
                        <td>{row.DATE}</td>
                        <td>{row.TIME || '-'}</td>

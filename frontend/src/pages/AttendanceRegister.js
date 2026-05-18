@@ -152,7 +152,6 @@ import React, { useState, useEffect, useCallback } from 'react';
          "S/N": index + 1, 
          "EMP CODE": row.RAW_EMPCODE, 
          "EMPLOYEE NAME": row.EMP_NAME, 
-         "DEPARTMENT": row.DEPARTMENT_NAME || '-',
          "LOCATION": row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-', 
          "DATE": row.DATE, 
          "CHECK IN": row.CHECK_IN || '-', 
@@ -192,12 +191,11 @@ import React, { useState, useEffect, useCallback } from 'react';
        doc.text(`Period: ${filters.fromDate} to ${filters.toDate}`, 14, 22); 
        doc.text(`Printed By: ${footerInfo?.PRINTEDUSER || 'System'} | Date: ${footerInfo?.DATE || ''}`, 14, 27); 
  
-       const tableColumn = ["S/N", "EMP CODE", "EMPLOYEE NAME", "DEPARTMENT", "LOCATION", "DATE", "CHECK IN", "CHECK OUT", "LOCATION (MOB)", "DIRECTION"]; 
+       const tableColumn = ["S/N", "EMP CODE", "EMPLOYEE NAME", "LOCATION", "DATE", "CHECK IN", "CHECK OUT", "LOCATION (MOB)", "DIRECTION"]; 
        const tableRows = allData.map((row, index) => [ 
          index + 1, 
          row.RAW_EMPCODE, 
          row.EMP_NAME, 
-         row.DEPARTMENT_NAME || '-',
          row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-', 
          row.DATE, 
          row.CHECK_IN || '-', 
@@ -384,7 +382,6 @@ import React, { useState, useEffect, useCallback } from 'react';
                    <th>S/N</th> 
                    <th>EMP CODE</th> 
                    <th>EMPLOYEE NAME</th> 
-                   <th>DEPARTMENT</th>
                    <th>LOCATION</th> 
                    <th>DATE</th> 
                    <th>CHECK IN</th> 
@@ -399,7 +396,6 @@ import React, { useState, useEffect, useCallback } from 'react';
                      <td>{index + 1}</td> 
                      <td>{row.RAW_EMPCODE}</td> 
                      <td className="fw-bold">{row.EMP_NAME}</td> 
-                     <td>{row.DEPARTMENT_NAME || '-'}</td>
                      <td>{row.LOCATION_NAME || row.LOC_NAME || row.LOCATION || '-'}</td> 
                      <td>{row.DATE}</td> 
                      <td>{row.CHECK_IN || '-'}</td> 
