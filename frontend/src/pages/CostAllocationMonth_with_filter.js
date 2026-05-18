@@ -153,7 +153,7 @@ function CostAllocationMonthWithFilter() {
       setError('');
 
       // Sending all filters to the API
-      const response = await costAllocationAPI.getDesignationSummaryWithFilters({
+      const response = await costAllocationAPI.synDesignationMultiPeriodSummaryWithFilters({
         payPeriods: filters.payPeriods.join(','),
         designations: filters.designations.join(','),
         employees: filters.employees.join(','),

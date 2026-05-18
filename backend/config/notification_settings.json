@@ -1,6 +1,6 @@
 {
   "absent": {
-    "enabled": true,
+    "enabled": false,
     "time": "12:48",
     "days": [
       1,

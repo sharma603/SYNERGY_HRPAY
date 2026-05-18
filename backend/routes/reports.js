@@ -16,10 +16,10 @@ router.post('/cost-allocation', auth, costAllocationController.getCostAllocation
 router.get('/cost-allocation/export', auth, costAllocationController.exportCostAllocationReport);
 
 // Designation Summary routes
-router.get('/designation-summary', auth, designationSummaryController.getDesignationMultiPeriodSummary);
-router.post('/designation-summary', auth, designationSummaryController.getDesignationMultiPeriodSummary);
-router.get('/designation-summary-filters', auth, designationSummaryController.getDesignationMultiPeriodSummarywithfilters);
-router.post('/designation-summary-filters', auth, designationSummaryController.getDesignationMultiPeriodSummarywithfilters);
+router.get('/designation-summary', auth, designationSummaryController.synDesignationMultiPeriodSummary);
+router.post('/designation-summary', auth, designationSummaryController.synDesignationMultiPeriodSummary);
+router.get('/designation-summary-filters', auth, designationSummaryController.synDesignationMultiPeriodSummarywithfilters);
+router.post('/designation-summary-filters', auth, designationSummaryController.synDesignationMultiPeriodSummarywithfilters);
 
 // Annual Leave Exit Permit routes
 router.get('/annual-leave-exit-permit', auth, annualLeaveController.getAnnualLeaveExitPermit);

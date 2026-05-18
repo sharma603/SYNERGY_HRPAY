@@ -60,7 +60,7 @@ function CostAllocationMonth() {
       setLoading(true);
       setError('');
       
-      const response = await costAllocationAPI.getDesignationSummary({
+      const response = await costAllocationAPI.synDesignationMultiPeriodSummary({
         payPeriods: filters.payPeriods.join(','),
         designations: filters.designations.join(',')
       });

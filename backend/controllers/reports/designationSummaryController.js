@@ -3,7 +3,7 @@ const { getConnection, sql } = require('../../config/database');
 /**
  * Get Designation DesignationMultiPeriodSummary Summary (Basic)
  */
-const getDesignationMultiPeriodSummary = async (req, res) => {
+const synDesignationMultiPeriodSummary = async (req, res) => {
   try {
     const params = req.method === 'POST' ? req.body : req.query;
     const { 
@@ -33,7 +33,7 @@ const getDesignationMultiPeriodSummary = async (req, res) => {
       companyName: companyInfo ? companyInfo.COMPANY_NAME : ''
     });
   } catch (error) {
-    console.error('Error in getDesignationMultiPeriodSummary:', error);
+    console.error('Error in synDesignationMultiPeriodSummary:', error);
     res.status(500).json({ error: 'Failed to fetch summary', details: error.message });
   }
 };
@@ -41,7 +41,7 @@ const getDesignationMultiPeriodSummary = async (req, res) => {
 /**
  * Get Designation DesignationMultiPeriodSummary Summary with all filters (Advanced)
  */
-const getDesignationMultiPeriodSummarywithfilters = async (req, res) => {
+const synDesignationMultiPeriodSummarywithfilters = async (req, res) => {
   try {
     const params = req.method === 'POST' ? req.body : req.query;
     const { 
@@ -83,12 +83,12 @@ const getDesignationMultiPeriodSummarywithfilters = async (req, res) => {
       companyName: companyInfo ? companyInfo.COMPANY_NAME : ''
     });
   } catch (error) {
-    console.error('Error in getDesignationMultiPeriodSummarywithfilters:', error);
+    console.error('Error in synDesignationMultiPeriodSummarywithfilters:', error);
     res.status(500).json({ error: 'Failed to fetch summary with filters', details: error.message });
   }
 };
 
 module.exports = {
-  getDesignationMultiPeriodSummary,
-  getDesignationMultiPeriodSummarywithfilters
+  synDesignationMultiPeriodSummary,
+  synDesignationMultiPeriodSummarywithfilters
 };
